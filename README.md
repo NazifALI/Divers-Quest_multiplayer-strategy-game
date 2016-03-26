@@ -7,7 +7,7 @@ A multiplayer 2D game of finding treasures in deep oceans.
 
 **Repository Structure:**
 
-**Team Members:**
+**Team Members:**  
 Gilberto Cruz   gilbertcruz@tamu.edu  
 Phuc Nguyen     pnguyen59@tamu.edu  
 Macie Hampton   ma2011hampton@tamu.edu  
