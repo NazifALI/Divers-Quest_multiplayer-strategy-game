@@ -1,4 +1,4 @@
-# Diver-s-Quest-P2D3
+# 315-game-Divers_Quest
 A multiplayer 2D game of finding treasures in deep oceans.
 
 **How to run the code?**
