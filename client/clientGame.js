@@ -4,7 +4,6 @@
 ** GAME VARIABLES
 **************************************************/
 var socket // Socket connection
-var land
 var player
 var sharks
 var wreckage
@@ -18,7 +17,6 @@ var timer
 // creating phaser game instance
 var game = new Phaser.Game(800, // width of game screen in pixels
 			  600,  // height of game screen in pixels
-                          Phaser.AUTO,
                           { preload, create, update, render }  // list of functions that define game state
 )
 
@@ -31,23 +29,15 @@ function preload () {
  	/* load other images as needed */
 }
 
-
 // create the game objects for play to begin
 function create () {
-  	// Initialise socket connection
-	socket = io.connect("http://localhost", {port: 20202, transports: ["websocket"]});
-  
-  	// list of active players connected to server
-  	players = []
-  	// starting position of our player
-  	var startX = Math.random() mod 800
-  	var startY = Math.random() mod 600
-  	cursors = game.input.keyboard.createCursorKeys()
-  	// Start listening for events
-  	setEventHandlers()
+	socket = io.connect( port = 20202 )	// initialise socket connection at port 20202
+  	playersActive = []			// list of active players connected to server
+  	// starting position of our player set
+  	setEventHandlers()			// start listening for events
 }
 
-
+// to send event to server
 function update () {
   	for (var i = 0; i < enemies.length; i++) {
     		if (enemies[i].alive) {
@@ -71,20 +61,62 @@ function update () {
 function render () {
 }
 
+/**************************************************
+** GAME EVENT HANDLERS
+**************************************************/
 
 var setEventHandlers = function () {
-  // socket connected successfully
-  socket.on('connect', onSocketConnected)
+  	socket.on( onSocketConnected)	// socket connected successfully
+  	socket.on( onSocketDisconnect)	// socket disconnected
+  	socket.on( onNewPlayer)		// new player message received
+  	socket.on( onMovePlayer)	// player move message received
+  	socket.on( onRemovePlayer)	// player removed message received
+  	
+  	socket.on( onBombPlaced)	// position of bomb placed message received
+  	socket.on( onWreckageDestroyed)	// wreckage destroyed message received
+  	socket.on( onPlayerKilled)	// player killed message received
+  	socket.on( onPowerpTaken)	// power ups taken message received
+  	socket.on( onHelpAsked)		// help message received
+  	socekt.on( onHelpGiven)		//  help given message received
+}
 
-  // socket disconnected
-  socket.on('disconnect', onSocketDisconnect)
+// Socket connected
+function onSocketConnected () {
+  	print('Connected to the server')
+  	emit('new player', { player.x, player.y })	// send local player data (x, y position) to server
+}
 
-  // new player message received
-  socket.on('new player', onNewPlayer)
+function onSocketDisconnected () {
+  	print('Disconnected from the server')
+}
 
-  // player move message received
-  socket.on('move player', onMovePlayer)
+function onNewPlayer (playerData) {
+  	playersActive.push(new Player(playerData))		// add the new player in the list of curren players
+}
 
-  // player removed message received
-  socket.on('remove player', onRemovePlayer)
+function onMovePlayer (playerData) {
+	var movePlayer = new playersActive.find(playerData.id)
+	movedPlayer.setX(playerData.X)				// update the new (X, Y) position of player
+	movedPlayer.setY(playerData.Y)
+}
+
+function onBombPlaced (bomb) {
+	bomb.attachToMap()	// add bomb to the map
+}
+
+function onWreckageDestroyed (wreckage) {
+	bomb.detachFromMap()	// remove wreckage from the map/landscape
+}
+
+function onPlayerKilled (playerData) {
+	playersActive.remove(playerData.id)	// remove the player form active players list
+}
+
+function onPowerupTaken (powerup){
+	powerup.detachFromMap()		// remove powerup as it has been taken
+}
+
+function onHelpAsked (playerData) {
+	Dialogueox( input Oxygen, input Flashlight)	// create dialogue box asking the player for supplies
+	
 }
