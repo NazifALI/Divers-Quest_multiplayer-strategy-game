@@ -24,7 +24,7 @@ var game = new Phaser.Game(800, // width of game screen in pixels
 // preload assets
 function preload () {
  	game.loadImage('background', 'assets/backgound.png')
- 	game.loadImage('shark', 'assets/shark.png)
+ 	game.loadImage('shark', 'assets/shark.png')
  	game.loadImage('wreckage', 'assets/wreckage.png')
  	game.loadImage('treasure', 'assets/treasure.png')
  	/* load other images as needed */
