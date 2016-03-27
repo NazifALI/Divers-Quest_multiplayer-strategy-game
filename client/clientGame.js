@@ -1,11 +1,4 @@
-//client side of game with phasors
-
-/**************************************************
-** IMPORTING NODE.JS LIBRARIES
-**************************************************/
-var util = require("util"),	// Utility resources (logging, object inspection, etc)
-	  io = require("socket.io"),  // Socket.IO
-	  Player = require("./Player").Player;  // Player class defined by us
+//client side of game with phaser
 
 /**************************************************
 ** GAME VARIABLES
