@@ -5,9 +5,10 @@
 **************************************************/
 var socket // Socket connection
 var player
-var sharks
+var bomb
 var wreckage
 var treasure
+var shark
 var timer
 
 /**************************************************
@@ -19,47 +20,6 @@ var game = new Phaser.Game(800, // width of game screen in pixels
 			  600,  // height of game screen in pixels
                           { preload, create, update, render }  // list of functions that define game state
 )
-
-// preload assets
-function preload () {
- 	game.loadImage('background', 'assets/backgound.png')
- 	game.loadImage('shark', 'assets/shark.png)
- 	game.loadImage('wreckage', 'assets/wreckage.png')
- 	game.loadImage('treasure', 'assets/treasure.png')
- 	/* load other images as needed */
-}
-
-// create the game objects for play to begin
-function create () {
-	socket = io.connect( port = 20202 )	// initialise socket connection at port 20202
-  	playersActive = []			// list of active players connected to server
-  	// starting position of our player set
-  	setEventHandlers()			// start listening for events
-}
-
-// to send event to server
-function update () {
-  	for (var i = 0; i < enemies.length; i++) {
-    		if (enemies[i].alive) {
-      			enemies[i].update()
-      			game.physics.collide(player, enemies[i].player)
-    		}
-  	}
-  	if (cursors.left.isDown) {
-  	} else if (cursors.right.isDown) {
-  	}
-  	if (cursors.up.isDown) {
-	  // The speed we'll travel at
-  	} else {
-
-  	}
-  
-  	socket.emit('move player', { x: player.x, y: player.y })
-}
-
-
-function render () {
-}
 
 /**************************************************
 ** GAME EVENT HANDLERS
