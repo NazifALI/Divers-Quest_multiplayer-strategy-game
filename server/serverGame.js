@@ -1,91 +1,54 @@
 /**************************************************
-** IMPORTING NODE.JS LIBRARIES
+** IMPORTING NODE.JS FUNCTIONALITIES
 **************************************************/
-var util = require("util"),	// Utility resources (logging, object inspection, etc)
-	  io = require("socket.io"),  // Socket.IO
-	  Player = require("./Player").Player;  // Player class defined by us
+var	util = require("util"),			// Utility resources (logging, object inspection, etc)
+	io = require("socket.io"),  		// Socket.IO. Socket.io simplifies the usage of websockets
+	Player = require("./Player").Player;  	// Player class defined by us
 
 /**************************************************
 ** GAME VARIABLES
 **************************************************/
 var socket // Socket connection
-var land
 var player
-var sharks
-var wreckage
-var treasure
-var timer
 
 /**************************************************
-** GAME DEFINITION USING PHASER API
+** GAME INITIALISATION
 **************************************************/
 
-// creating phaser game instance
-var game = new Phaser.Game(800, // width in pixels
-                          600,  // height in pixels
-                          Phaser.AUTO,
-                          { preload: preload, create: create, update: update, render: render }  // list of functions that define game state
-)
-
-// preload assets
-function preload () {
-  game.load.image('background', 'assets/backgound.png')
-  game.load.image('shark', 'assets/shark.png)
-  game.load.image('wreckage', 'assets/wreckage.png')
-  game.load.image('treasure', 'assets/treasure.png')
-  /* load other images as needed */
-}
-// create the game objects for play to begin
-function create () {
-  // listen for socket events on port number 20202
-  socket = io.listen(20202)
-  
-  // list of active players connected to server
-  players = []
-  // starting position of our player
-  var startX = Math.random() mod 800
-  var startY = Math.random() mod 600
-  cursors = game.input.keyboard.createCursorKeys()
-  // Start listening for events
-  setEventHandlers()
-}
-function update () {
-  for (var i = 0; i < enemies.length; i++) {
-    if (enemies[i].alive) {
-      enemies[i].update()
-      game.physics.collide(player, enemies[i].player)
-    }
-  }
-  if (cursors.left.isDown) {
-  } else if (cursors.right.isDown) {
-  }
-  if (cursors.up.isDown) {
-    // The speed we'll travel at
-  } else {
-
-  }
-  
-  socket.emit('move player', { x: player.x, y: player.y })
+// estabish connection and listen to events
+function init () {
+  	socket = io.listen(20202)	// listen for socket events on port number 20202
+  	players = []			// list of active players connected to server
+  	setEventHandlers()		// Start listening for events
 }
 
+var setEventHandlers = function() {
+	// if a socket connection is established then go to onSocketConnection function
+	sockets.on( onSocketConnection(socket));
+};
 
-function render () {
+function onSocketConnection (clientSocket) {
+  	print('New player has connected: ' + clientSocket.id)
+  	clientSocket.on( onClientDisconnect)	// Listen message for client disconnected
+  	clientSocket.on( onNewPlayer)		// Listen message for new player message
+  	clientSocket.on( onMovePlayer)		// Listen message for move player message
+};
+
+function onClientDisconnect (clientSocket) {
+	print( 'Client %d Disconnected', clientSocket.id)
+	players.remove(clientSocket.id)					// remove player from the active players list
+	clientSocket.broadcast( 'remove player', allClientSockets)	// update all players on the removal of a player
 }
 
+function onNewPlayer (playerData) {
+	var newPlayer = new Player(playerData.X, playerData.Y)	//initiate new player with given position
+	clientSocket.broadcast( 'new player', allClientSockets)	// let all players know about the new player added
+	players.push(newPlayer)					//put new player to active players list
+}
 
-var setEventHandlers = function () {
-  // socket connected successfully
-  socket.on('connect', onSocketConnected)
-
-  // socket disconnected
-  socket.on('disconnect', onSocketDisconnect)
-
-  // new player message received
-  socket.on('new player', onNewPlayer)
-
-  // player move message received
-  socket.on('move player', onMovePlayer)
-
-  // player removed message received
-  socket.on('remove player', onRemovePlayer)
+function onMovePlayer (playerData) {
+	var movedPlayer = players.find(playerData.id)	// find the moved player
+	movedPlayer.setX(playerData.X)			// update the new (X, Y) position of player
+	movedPlayer.setY(playerData.Y)
+	broadcast('moved player', allClientSockets)	// update screens of all player with the new position of player
 }
