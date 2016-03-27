@@ -1,5 +1,5 @@
 # 315-game-Divers_Quest
-A multiplayer 2D game of finding treasures in deep oceans.
+A 2D multiplayer game about finding treasures in deep, dark oceans.
 
 **How to run the code?**
 
