@@ -1,5 +1,5 @@
 /*
-Pseudocode for client side of game with phaser API.
+Pseudocode for client side of game implemented using Phaser API Framework.
 The arguments of the event handler functions and emit() function clearly shows which data
 is being passed to the server and received from ther server.
 */
