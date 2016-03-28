@@ -1,1 +1,1 @@
-the foler holds pictures and images of game objects e.g. shark, wreckage, treasure etc
+The folder holds pictures and images of game objects e.g. shark, bomb, treasure etc. However, pictures cannot be uploaded to github through the browser.
