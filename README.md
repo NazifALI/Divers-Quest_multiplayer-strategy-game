@@ -8,7 +8,7 @@ Since the current version of code is just pseudocode, it would not compile. Howe
 Since the current version of the code is just pseudocode it does not compile.
 
 **Repository Structure:**  
-Client folder contains all the game objects (eg. players, sharks, treasure) and the pseudocode used to run them on the browser. Server folder has the serverGame.js pseudocod file which manages onnections to all the players
+Client folder contains all the game objects (eg. players, sharks, treasure) and the pseudocode used to run them on the browser. Server folder has the serverGame.js pseudocod file which manages connections to all the players
 
 **Team Members:**  
 Gilberto Cruz   gilbertcruz@tamu.edu  
