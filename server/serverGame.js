@@ -9,7 +9,7 @@ var	util = require("util"),			// Utility resources (logging, object inspection, 
 ** GAME VARIABLES
 **************************************************/
 var socket	// Socket connection
-var players 	// list of layers conected
+var players 	// list of players connected
 
 /**************************************************
 ** GAME INITIALISATION AND EVENTS
