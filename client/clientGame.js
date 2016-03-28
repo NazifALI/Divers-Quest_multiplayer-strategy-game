@@ -41,7 +41,7 @@ function create () {
 
 // to send event to server
 function update () {
-  	for (var i = 0; i < playersActive.length; i++) {
+  	for (i range (0, playersActive.length)){
   		playersActive[i].update()	// update the state and position of each player in the game
   	}
   	if( key.UPARROW.pressed() || key.DOWNARROW.pressed() || key.RIGHTARROW.pressed() || key.LEFTARROW.pressed()){
@@ -51,7 +51,7 @@ function update () {
   	if( key.B.pressed()){		// if bomb is placed then attach it to map and send its position to server
   		bomb.attachToMap()
   		emit('bomb placed', (bomb.X, bomb.Y))
-  		wait(bomb.timer())	// wait for the bomb to explode
+  		timer.wait(bomb.explodeTime)	// wait for the bomb to explode
   		emit('wreckage destroyed', wreckage)	// send the destroyed wreckage to server
   	}
   	if( key.CTRL.pressed() && key.S.pressed()){
@@ -90,7 +90,7 @@ var setEventHandlers = function () {
   	socket.on( onPlayerKilled)	// player killed message received
   	socket.on( onPowerpTaken)	// power ups taken message received
   	socket.on( onHelpAsked)		// help message received
-  	socekt.on( onHelpGiven)		//  help given message received
+  	socekt.on( onHelpGiven)		// help given message received
   	socket.on( onTreasureFound)	// treasure found message received
 }
 
