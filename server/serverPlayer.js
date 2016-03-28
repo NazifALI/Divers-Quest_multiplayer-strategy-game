@@ -1,4 +1,4 @@
-// server definition of player to store each player's position and id
+// pseudo code for server definition of player to store each player's position and id
 // new player class is made because the server does not use many of the variables defined in client's player class
 
 /**************************************************
