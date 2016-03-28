@@ -38,6 +38,7 @@ function onSocketConnection (clientSocket) {
   	clientSocket.on( onPowerpTaken)		// listen for power ups taken message
   	clientSocket.on( onHelpAsked)		// listen for help message
   	clientSocekt.on( onHelpGiven)		// listen for help given message
+  	clientSocket.on( onTreasureFound)	// listen for treasure found message
 };
 
 function onClientDisconnect (clientSocket) {
@@ -83,4 +84,8 @@ function onHelpAsked (playerData) {
 function onHelpGiven (supplies) {
 	emit('help provided', [playerData.oxygen, playerData.flashlight], supplies.clientSocket.id)
 		// oxygen and flashlight amount in the list given to the player recognised by the clientSocket id
+}
+
+function onTreasureFound (playerData){
+	emit('game won', playerData.id, allClientSockets)	// let every player know the game is won
 }
