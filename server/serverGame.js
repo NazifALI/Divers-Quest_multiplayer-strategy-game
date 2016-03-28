@@ -1,3 +1,9 @@
+/*
+Pseudocode for server side of game with Nodejs API to implement socket connection to clients.
+The arguments of the event handler functions and emit() function clearly shows which data
+is being passed to the client and received from it.
+*/
+
 /**************************************************
 ** IMPORTING NODE.JS FUNCTIONALITIES
 **************************************************/
