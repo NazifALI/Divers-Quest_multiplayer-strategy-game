@@ -92,7 +92,7 @@ var setEventHandlers = function () {
   	socket.on( onHelpAsked)		// help message received
   	socekt.on( onHelpGiven)		// help given message received
   	socket.on( onTreasureFound)	// treasure found message received
-  	socket.on(sharkKilled)        //shark kills by bomb
+  	socket.on( onSharkKilled)        //shark kills by bomb
 }
 
 // Socket connected
