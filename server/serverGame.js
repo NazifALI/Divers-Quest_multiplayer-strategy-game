@@ -9,7 +9,11 @@ var	util = require("util"),			// Utility resources (logging, object inspection, 
 ** GAME VARIABLES
 **************************************************/
 var socket	// Socket connection
-var players 	// list of players connected
+var players= {
+	var timer; // the amount of time left
+	var bomb;// number of bomb player have
+	x, y // position
+} 	// list of players connected
 
 /**************************************************
 ** GAME INITIALISATION AND EVENTS
@@ -88,4 +92,26 @@ function onHelpGiven (supplies) {
 
 function onTreasureFound (playerData){
 	emit('game won', playerData.id, allClientSockets)	// let every player know the game is won
+}
+//this function will loop forever for 1000/24 s
+function updatePlayer(playerId) //update the time, positon, bomb
+{
+	var pack = onKeyPress() // take user arrow inputs 
+	emit("new position", pack) // send the new postion the clinet to redraw
+	emit("new time", time--)// send new time
+}
+
+function onKeyPress(playerId)
+{
+var pack={ // contain the new position of the player
+   if left arrow
+	players[playerId].x -= speed; //change position by a constant speed
+if right arrow
+	players[playerId].x += speed;
+	 if down arrow
+	players[playerId].y += speed;
+	if up arrow
+	player[playerId].y -=speed;
+}	 
+return pack
 }
