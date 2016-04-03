@@ -7,6 +7,8 @@ var explosion;
 var diver;
 var wreckage;
 
+var timer;
+var loop;
 var oxygenLevel = 100;
 var oxygenText;
 var endingText;
@@ -26,6 +28,10 @@ var mainState = {
 		mask = game.add.graphics(0,0);
 		mask.beginFill(0xffffff);
 		
+		// timer
+		timer = game.time.events;
+		loop = timer.loop(Phaser.Timer.SECOND, OxygenDec, this);
+
 		// adding 
 		oceanfloor = game.add.tileSprite(0,0,800,600, 'backgroundCode');
 		
@@ -85,6 +91,12 @@ var mainState = {
 		game.physics.arcade.overlap(diver, oxygenPowerUps, collectOxygen, null, this);
 		game.physics.arcade.overlap(diver, treasures, winner, null, this);
 		
+		if(oxygenLevel == 0){
+			timer.pause;
+			endingText = game.add.text(400, 300, 'YOU LOSE!', {fontSize: '1500px', fill: '#090'} );
+			game.paused = true;
+		}
+
 		if (game.input.keyboard.isDown(Phaser.Keyboard.B)){
 			explosion.reset(diver.x-100, diver.y-50);
 			explosion.animations.play('explode', 40, false);
@@ -115,16 +127,22 @@ var mainState = {
 	// //diver.velocity.
 // }
 
+function OxygenDec() {
+	oxygenLevel -= 1;
+	oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
+
+}
+
 function collectOxygen ( diver, oxygen) {
 	oxygen.kill();
-	oxygenLevel += 30;
+	oxygenLevel = 100;
 	oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
 }
 
 function winner(diver, treasure){
-	endingText = game.add.text(400, 300, 'YOU WIN!', {fintSize: '40px', fill: '#090'} );
-	//game.world.bringToTop(mask);
-}
+	endingText = game.add.text(400, 300, 'YOU WIN!', {fontSize: '1500px', fill: '#090'} );
+	game.paused = true;
+	}
 
 game.state.add('mainState', mainState);
 game.state.start('mainState');
