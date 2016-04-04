@@ -6,10 +6,12 @@ var flashlight;
 var explosion;
 var diver;
 var wreckage;
+var shark;
+var text;
 
 var timer;
 var loop;
-var oxygenLevel = 100;
+var oxygenLevel = 100.25;
 var oxygenText;
 var endingText;
 
@@ -22,6 +24,7 @@ var mainState = {
 		game.load.image('treasure', 'assets/treasure.png');
 		game.load.image('oxygen', 'assets/oxygen.png');
 		game.load.spritesheet('kaboomCode', 'assets/explosion.png', 64, 64);
+		game.load.image('shark', 'assets/Shark.png');
 	},
 	
 	create:function(){
@@ -79,21 +82,38 @@ var mainState = {
 		diver.body.drag.x = 100;
 		diver.body.drag.y = 100;
 		diver.body.collideWorldBounds = true;
+
+		//changes made
+		game.physics.startSystem(Phaser.Physics.ARCADE);
+		game.physics.arcade.gravity.y = 0;
+
+		shark = game.add.sprite(600, 0, 'shark');
+		shark.anchor.setTo(0.5);
+		shark.scale.setTo(.17);
 		
+		game.physics.enable([ shark], Phaser.Physics.ARCADE);
+
+	    shark.body.collideWorldBounds = true;
+	    shark.body.gravity.y = 200;
+	    shark.body.bounce.set(1);
+	    shark.mask = mask;
+
 		// bomb explosion
 		explosion = game.add.sprite(diver.x, diver.y, 'kaboomCode');
 		explosion.animations.add('explode', [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24])
 		
 		oxygenText = game.add.text(16, 16, 'Oxygen Level 100%', {fintSize: '32px', fill: '#090'} );
+
+		//text = game.add.text(16, 16, 'Overlapping: false', { fill: '#ffffff' });
 	},
 	
 	update:function(){
 		game.physics.arcade.overlap(diver, oxygenPowerUps, collectOxygen, null, this);
 		game.physics.arcade.overlap(diver, treasures, winner, null, this);
 		
-		if(oxygenLevel == 0){
+		if(oxygenLevel <= 0){
 			timer.pause;
-			endingText = game.add.text(400, 300, 'YOU LOSE!', {fontSize: '1500px', fill: '#090'} );
+			endingText = game.add.text(0, 300, 'YOU LOSE!', {fontSize: '130px', fill: '#090'} );
 			game.paused = true;
 		}
 
@@ -119,6 +139,14 @@ var mainState = {
 		mask.y = diver.y;
 		//game.physics.arcade.overlap(diver, wreckage, diverHitWreckage, null, this);
 		game.physics.arcade.collide(diver, wreckage);
+
+		if (checkOverlap(shark, diver)){
+			oxygenLevel -= .25;
+			oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
+		}
+		else{
+			null;
+		}
 	}
 }
 
@@ -127,8 +155,14 @@ var mainState = {
 	// //diver.velocity.
 // }
 
+function checkOverlap(shark, diver){
+	var boundsA = shark.getBounds();
+	var boundsB = diver.getBounds();
+	return Phaser.Rectangle.intersects(boundsA, boundsB);
+}
+
 function OxygenDec() {
-	oxygenLevel -= 1;
+	oxygenLevel -= 30;
 	oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
 
 }
@@ -140,7 +174,7 @@ function collectOxygen ( diver, oxygen) {
 }
 
 function winner(diver, treasure){
-	endingText = game.add.text(400, 300, 'YOU WIN!', {fontSize: '1500px', fill: '#090'} );
+	endingText = game.add.text(0, 300, 'YOU WIN!', {fontSize: '150px', fill: '#090'} );
 	game.paused = true;
 	}
 
