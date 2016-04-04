@@ -162,7 +162,7 @@ function checkOverlap(shark, diver){
 }
 
 function OxygenDec() {
-	oxygenLevel -= 30;
+	oxygenLevel -= 1;
 	oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
 
 }
