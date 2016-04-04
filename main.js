@@ -1,4 +1,4 @@
-var game = new Phaser.Game(800, 600, Phaser.CANVAS, 'gameDiv');
+var game = new Phaser.Game(1000, 800, Phaser.CANVAS, 'gameDiv');
 //var game = new Phaser.Game(800, 600, Phaser.CANVAS, {preload: preload, create: create, update: update} );
 
 var oceanfloor;
@@ -36,13 +36,13 @@ var mainState = {
 		loop = timer.loop(Phaser.Timer.SECOND, OxygenDec, this);
 
 		// adding 
-		oceanfloor = game.add.tileSprite(0,0,800,600, 'backgroundCode');
+		oceanfloor = game.add.tileSprite(0,0,1000,800, 'backgroundCode');
 		
 		//adding treasure
 		treasures = game.add.group();
 		treasures.enableBody = true;
 		treasures.physicsBodyType = Phaser.Physics.ARCADE;
-		var treasure = treasures.create(400,500,'treasure');
+		var treasure = treasures.create(900,700,'treasure');
 		treasure.anchor.setTo(0.5,0.5);
 		treasure.body.immovable = false;
 		treasure.scale.x = 0.4;
@@ -52,7 +52,7 @@ var mainState = {
 		oxygenPowerUps = game.add.group();
 		oxygenPowerUps.enableBody = true;
 		oxygenPowerUps.physicsBodyType = Phaser.Physics.ARCADE;
-		var oxygen = oxygenPowerUps.create(500,300,'oxygen');
+		var oxygen = oxygenPowerUps.create(100,700,'oxygen');
 		oxygen.anchor.setTo(0.5,0.5);
 		oxygen.body.immovable = false;
 		oxygen.scale.x = 0.2;
@@ -63,19 +63,27 @@ var mainState = {
 		wreckage.enableBody = true;
 		wreckage.physicsBodyType = Phaser.Physics.ARCADE;
 		var obstacle = wreckage.create(100,100,'wreckageCode');
+		var obstacle2 = wreckage.create(100,300, 'wreckageCode');
+		var obstacle3 = wreckage.create(450,200, 'wreckageCode')
 		obstacle.anchor.setTo(0.5,0.5);
 		obstacle.body.immovable = true;
+		obstacle2.anchor.setTo(0.5,0.5);
+		obstacle2.body.immovable = true;
+		obstacle3.anchor.setTo(0.5,0.5);
+		obstacle3.body.immovable = true;
 		
 		obstacle.mask=mask;
+		obstacle2.mask=mask;
+		obstacle3.mask=mask;
 		oceanfloor.mask = mask;
 		treasures.mask = mask;
 		oxygenPowerUps.mask = mask;
 		
 		// make vision
-		mask.drawCircle(0,0,120);
+		mask.drawCircle(0,0,200);
 		
 		// adding diver's movement
-		diver = game.add.sprite( game.world.centerX, game.world.centerY, 'diverCode');
+		diver = game.add.sprite( game.world.centerX-50, game.world.centerY, 'diverCode');
 		diver.anchor.setTo(0.5, 0.5);
 		diver.scale.setTo(0.15, 0.15);
 		game.physics.enable(diver, Phaser.Physics.ARCADE);
@@ -87,20 +95,44 @@ var mainState = {
 		game.physics.startSystem(Phaser.Physics.ARCADE);
 		game.physics.arcade.gravity.y = 0;
 
-		shark = game.add.sprite(600, 0, 'shark');
+		// shark 1
+		shark = game.add.sprite(600, 500, 'shark');
 		shark.anchor.setTo(0.5);
 		shark.scale.setTo(.17);
 		
 		game.physics.enable([ shark], Phaser.Physics.ARCADE);
 
 	    shark.body.collideWorldBounds = true;
-	    shark.body.gravity.y = 200;
+	    shark.body.gravity.y = -200;
 	    shark.body.bounce.set(1);
-	    shark.mask = mask;
+		shark.mask = mask;
+		// shark 2
+		shark2 = game.add.sprite(600, 600, 'shark');
+		shark2.anchor.setTo(0.5);
+		shark2.scale.setTo(.17);
+		
+		game.physics.enable([ shark2], Phaser.Physics.ARCADE);
+
+	    shark2.body.collideWorldBounds = true;
+	    shark2.body.gravity.x = -200;
+	    shark2.body.bounce.set(1);
+		shark2.mask = mask;
+		
+		// sharks = game.add.group();
+		// sharks.enableBody = true;
+		// sharks.physicsBodyType = Phaser.Physics.ARCADE;
+		// sharks.setALL("collideWorldBounds");
+		// var shark = sharks.create(100,200,'treasure');
+		// shark.anchor.setTo(0.5,0.5);
+		// shark.body.immovable = false;
+		// shark.scale.x = 0.4;
+		// shark.scale.y = 0.4;
+		
+	   // shark.mask = mask;
 
 		// bomb explosion
-		explosion = game.add.sprite(diver.x, diver.y, 'kaboomCode');
-		explosion.animations.add('explode', [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24])
+		//explosion = game.add.sprite(diver.x, diver.y, 'kaboomCode');
+		//explosion.animations.add('explode', [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24])
 		
 		oxygenText = game.add.text(16, 16, 'Oxygen Level 100%', {fintSize: '32px', fill: '#090'} );
 
@@ -118,7 +150,13 @@ var mainState = {
 		}
 
 		if (game.input.keyboard.isDown(Phaser.Keyboard.B)){
-			explosion.reset(diver.x-100, diver.y-50);
+			// add explosion
+			if( diver.scale.x > 0 ) {
+				explosion = game.add.sprite(diver.x-100, diver.y-50, 'kaboomCode');
+			} else {
+				explosion = game.add.sprite(diver.x+30, diver.y-50, 'kaboomCode');
+			}
+			explosion.animations.add('explode', [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24])
 			explosion.animations.play('explode', 40, false);
 		}
 		if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT)) {
@@ -135,7 +173,11 @@ var mainState = {
 		if (game.input.keyboard.isDown(Phaser.Keyboard.DOWN)){
 			diver.body.velocity.y = 70
 		}
-		mask.x = diver.x;
+		if( diver.scale.x > 0){
+			mask.x = diver.x-50;
+		} else {
+			mask.x = diver.x+50;
+		}
 		mask.y = diver.y;
 		//game.physics.arcade.overlap(diver, wreckage, diverHitWreckage, null, this);
 		game.physics.arcade.collide(diver, wreckage);
@@ -162,9 +204,8 @@ function checkOverlap(shark, diver){
 }
 
 function OxygenDec() {
-	oxygenLevel -= 1;
+	oxygenLevel -= 2;
 	oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
-
 }
 
 function collectOxygen ( diver, oxygen) {
