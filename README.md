@@ -2,13 +2,13 @@
 A 2D multiplayer game about finding treasures in deep, dark oceans.
 
 **How to run the code?**  
-Since the current version of code is just pseudocode, it would not compile. However, the code in the server folder will run on compute.cs.tamu.edu. While the code in client foler will run on the user's browser.
+To run the code, download the github zip file and extract it. Then drag the index.html file into Chrome browser and the game interface should pop up. Then Play!
 
 **How to compile the code?**  
-Since the current version of the code is just pseudocode it does not compile.
+Since the server side of the code has not yet been integrated with the game. There is no need to compile the code.
 
 **Repository Structure:**  
-Client folder contains all the game objects (eg. players, sharks, treasure) and the pseudocode used to run them on the browser. Server folder has the serverGame.js pseudocod file which manages connections to all the players
+Server folder has the serverGame.js file which manages connections to all the players. main.js contains the client side of the code. While index.html has the html code linking to the client code. Assets folder has all the images used in the game interface.
 
 **Team Members:**  
 Gilberto Cruz   gilbertcruz@tamu.edu  
