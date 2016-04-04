@@ -8,7 +8,7 @@ To run the code, download the github zip file and extract it. Then drag the inde
 Since the server side of the code has not yet been integrated with the game. There is no need to compile the code.
 
 **Repository Structure:**  
-Server folder has the serverGame.js file which manages connections to all the players. main.js contains the client side of the code. While index.html has the html code linking to the client code. Assets folder has all the images used in the game interface.
+Server folder has the serverGame.js file which manages connections to all the players. main.js contains the client side of the code. While index.html has the html code linking to the client code. Assets folder has all the images used in the game interface, and phaser.js contains the gaming engine i.e. the Phaser API.
 
 **Team Members:**  
 Gilberto Cruz   gilbertcruz@tamu.edu  
