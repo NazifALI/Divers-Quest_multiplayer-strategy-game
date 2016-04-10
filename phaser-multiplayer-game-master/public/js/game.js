@@ -49,7 +49,7 @@ function create () {
   land = game.add.tileSprite(0, 0, 1000, 1000, 'back')
   game.world.setBounds(0, 0, 1000, 1000)
   land.fixedToCamera = true
- // land.mask=mask;
+  
   
   //timer
   timer = game.time.events;
@@ -75,6 +75,7 @@ function create () {
 	treasure.body.immovable = false;
 	treasure.scale.x = 0.4;
 	treasure.scale.y = 0.4;
+  treasure.mask = mask;
 	
  // adding oxygen power up
 		oxygenPowerUps = game.add.group();
@@ -85,6 +86,7 @@ function create () {
 		oxygen.body.immovable = false;
 		oxygen.scale.x = 0.2;
 		oxygen.scale.y = 0.2;
+    oxygen.mask = mask;
 
     // power power up
     powerPowerUp = game.add.group();
@@ -99,7 +101,7 @@ function create () {
 	    shark.body.collideWorldBounds = true;
 	    shark.body.gravity.y = -200;
 	    shark.body.bounce.set(1);
-		//shark.mask = mask;
+		shark.mask = mask;
 
   // adding wreckage
 		wreckage = game.add.group();
@@ -114,7 +116,12 @@ function create () {
 		obstacle2.body.immovable = true;
 		obstacle3.anchor.setTo(0.5,0.5);
 		obstacle3.body.immovable = true;		
-  // treasures.mask= mask;
+    obstacle.mask = mask;
+    obstacle2.mask = mask;
+    obstacle3.mask = mask;
+    land.mask=mask;
+
+
    mask.drawCircle(0,0,120)
   
   game.physics.enable(player, Phaser.Physics.ARCADE)
@@ -130,8 +137,7 @@ function create () {
   player.bringToTop()
 
   game.camera.follow(player)
- // game.camera.deadzone = new Phaser.Rectangle(150, 150, 500, 300)	
- // game.camera.focusOnXY(0, 0)
+
 
   cursors = game.input.keyboard.createCursorKeys()
 
@@ -271,6 +277,13 @@ function update () {
 	  player.body.velocity.y= 70;
     }
   }
+
+  if (player.scale.x > 0){
+    mask.x = player.x-50;
+  } else {
+    mask.x = player.x+50;
+  }
+  mask.y = player.y;
 
   land.tilePosition.x = -game.camera.x
   land.tilePosition.y = -game.camera.y
