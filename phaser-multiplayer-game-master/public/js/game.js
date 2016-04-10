@@ -9,7 +9,7 @@ function preload () {
   game.load.image('back','assets/back.png')
   game.load.image('treasure', 'assets/treasure.png');
   game.load.image('shark', 'assets/shark.png')
-  //game.load.image('oxygen', 'assets/oxygen.png')
+  game.load.image('oxygen', 'assets/oxygen.png')
   game.load.image('wreckageCode', 'assets/Wreckage.png');
   game.load.spritesheet('dude', 'assets/dude.png', 64, 64)
   game.load.spritesheet('enemy', 'assets/dude.png', 64, 64)
@@ -43,10 +43,11 @@ function create () {
   mask.beginFill(0xffffff)
  
   // Resize our game world to be a 2000 x 2000 square
-  game.world.setBounds(-500, -500, 1000, 1000)
+ 
 
   // Our tiled scrolling background
-  land = game.add.tileSprite(0, 0, 800, 600, 'back')
+  land = game.add.tileSprite(0, 0, 1000, 1000, 'back')
+  game.world.setBounds(0, 0, 1000, 1000)
   land.fixedToCamera = true
  // land.mask=mask;
   
@@ -60,6 +61,8 @@ function create () {
   var startY = Math.round(Math.random() * (1000) - 500)
   player = game.add.sprite(startX, startY, 'dude')
   player.anchor.setTo(0.5, 0.5)
+  game.physics.enable(player, Phaser.Physics.ARCADE)
+  player.body.collideWorldBounds=true;
   player.animations.add('move', [0, 1, 2, 3, 4, 5, 6, 7], 20, true)
   player.animations.add('stop', [3], 20, true)
 
@@ -73,15 +76,15 @@ function create () {
 	treasure.scale.x = 0.4;
 	treasure.scale.y = 0.4;
 	
-  // adding oxygen power up
-	/*	oxygenPowerUps = game.add.group();
+ // adding oxygen power up
+		oxygenPowerUps = game.add.group();
 		oxygenPowerUps.enableBody = true;
 		oxygenPowerUps.physicsBodyType = Phaser.Physics.ARCADE;
 		var oxygen = oxygenPowerUps.create(500,450,'oxygen');
 		oxygen.anchor.setTo(0.5,0.5);
 		oxygen.body.immovable = false;
 		oxygen.scale.x = 0.2;
-		oxygen.scale.y = 0.2;*/
+		oxygen.scale.y = 0.2;
   //shark1
   shark = game.add.sprite(400, 500, 'shark');
 		shark.anchor.setTo(0.5);
@@ -123,9 +126,8 @@ function create () {
   player.bringToTop()
 
   game.camera.follow(player)
-  game.camera.deadzone = new Phaser.Rectangle(150, 150, 500, 300)	
-
-  game.camera.focusOnXY(0, 0)
+ // game.camera.deadzone = new Phaser.Rectangle(150, 150, 500, 300)	
+ // game.camera.focusOnXY(0, 0)
 
   cursors = game.input.keyboard.createCursorKeys()
 
