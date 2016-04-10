@@ -1,6 +1,6 @@
 /* global Phaser RemotePlayer io */
 
-var game = new Phaser.Game(800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update, render: render })
+var game = new Phaser.Game(800, 600, Phaser.CANVAS,' ', { preload: preload, create: create, update: update, render: render })
 
 function preload () {
   game.load.image('earth', 'assets/light_sand.png')
@@ -9,6 +9,8 @@ function preload () {
   game.load.image('back','assets/back.png')
   game.load.image('treasure', 'assets/treasure.png');
   game.load.image('shark', 'assets/shark.png')
+  //game.load.image('oxygen', 'assets/oxygen.png')
+  game.load.image('wreckageCode', 'assets/Wreckage.png');
   game.load.spritesheet('dude', 'assets/dude.png', 64, 64)
   game.load.spritesheet('enemy', 'assets/dude.png', 64, 64)
   game.load.spritesheet('kaboomCode', 'assets/explosion.png', 64, 64);
@@ -26,8 +28,13 @@ var enemies
 var loop
 
 var currentSpeed = 0
-var oxygenLevel =100;
+var timer;
+var loop;
+var oxygenLevel = 100;
+var oxygenText;
 var powerLevel = 100;
+var powerText;
+var endingText;
 var cursors
 
 function create () {
@@ -41,12 +48,12 @@ function create () {
   // Our tiled scrolling background
   land = game.add.tileSprite(0, 0, 800, 600, 'back')
   land.fixedToCamera = true
-  land.mask=mask;
+ // land.mask=mask;
   
   //timer
-  /*timer = game.time.events;
+  timer = game.time.events;
   loop = timer.loop(Phaser.Timer.SECOND, OxygenDec, this);
-  loop = timer.loop(Phaser.Timer.SECOND, PowerDec, this);*/
+  loop = timer.loop(Phaser.Timer.SECOND, PowerDec, this);
   
   // The base of our player
   var startX = Math.round(Math.random() * (1000) - 500)
@@ -66,25 +73,48 @@ function create () {
 	treasure.scale.x = 0.4;
 	treasure.scale.y = 0.4;
 	
+  // adding oxygen power up
+	/*	oxygenPowerUps = game.add.group();
+		oxygenPowerUps.enableBody = true;
+		oxygenPowerUps.physicsBodyType = Phaser.Physics.ARCADE;
+		var oxygen = oxygenPowerUps.create(500,450,'oxygen');
+		oxygen.anchor.setTo(0.5,0.5);
+		oxygen.body.immovable = false;
+		oxygen.scale.x = 0.2;
+		oxygen.scale.y = 0.2;*/
   //shark1
-  shark = game.add.sprite(game.rnd.integerInRange(0,900), 500, 'shark');
+  shark = game.add.sprite(400, 500, 'shark');
 		shark.anchor.setTo(0.5);
-		shark.scale.setTo(.17);
+		shark.scale.setTo(1.5,1.4);
 		game.physics.enable([shark],Phaser.Physics.ARCADE)
 		shark.physicsBodyType = Phaser.Physics.ARCADE;
 
 	    shark.body.collideWorldBounds = true;
 	    shark.body.gravity.y = -200;
 	    shark.body.bounce.set(1);
-		shark.mask = mask;
-	
-   treasures.mask= mask;
+		//shark.mask = mask;
+
+  // adding wreckage
+		wreckage = game.add.group();
+		wreckage.enableBody = true;
+		wreckage.physicsBodyType = Phaser.Physics.ARCADE;
+		var obstacle = wreckage.create(100,100,'wreckageCode');
+		var obstacle2 = wreckage.create(100,300, 'wreckageCode');
+		var obstacle3 = wreckage.create(450,200, 'wreckageCode')
+		obstacle.anchor.setTo(0.5,0.5);
+		obstacle.body.immovable = true;
+		obstacle2.anchor.setTo(0.5,0.5);
+		obstacle2.body.immovable = true;
+		obstacle3.anchor.setTo(0.5,0.5);
+		obstacle3.body.immovable = true;		
+  // treasures.mask= mask;
    mask.drawCircle(0,0,120)
   
-  // This will force it to decelerate and limit its speed
-  // player.body.drag.setTo(200, 200)
- // player.body.maxVelocity.setTo(400, 400)
   game.physics.enable(player, Phaser.Physics.ARCADE)
+  // This will force it to decelerate and limit its speed
+  player.body.drag.x= 100;
+  player.body.drag.y= 100;
+  
   player.body.collideWorldBounds = true
 
   // Create some baddies to waste :)
@@ -93,11 +123,17 @@ function create () {
   player.bringToTop()
 
   game.camera.follow(player)
-  game.camera.deadzone = new Phaser.Rectangle(150, 150, 500, 300)
+  game.camera.deadzone = new Phaser.Rectangle(150, 150, 500, 300)	
+
   game.camera.focusOnXY(0, 0)
 
   cursors = game.input.keyboard.createCursorKeys()
 
+  
+  oxygenText = game.add.text(16, 16, 'Oxygen Level: 100%', {fintSize: '32px', fill: '#090'} );
+		powerText = game.add.text(16, 50, 'Power Level: 100%', {fintSize: '32px', fill: '#FF0'} );
+	oxygenText.fixedToCamera=true;
+   powerText.fixedToCamera=true;	
   // Start listening for events
   setEventHandlers()
 }
@@ -197,7 +233,6 @@ function update () {
   for (var i = 0; i < enemies.length; i++) {
     if (enemies[i].alive) {
       enemies[i].update()
-      //game.physics.collide(player, enemies[i].player)
     }
   }
 
@@ -214,18 +249,10 @@ function update () {
     currentSpeed = 300
 	player.body.velocity.y = -70;
   } else {
-    if (cursors.down.isDonw) {
+    if (cursors.down.isDown) {
       currentSpeed -= 4
 	  player.body.velocity.y= 70;
     }
-  }
-  
-  //game.physics.velocityFromRotation(player.rotation, currentSpeed, player.body.velocity)
-
-  if (currentSpeed > 0) {
-    player.animations.play('move')
-  } else {
-    player.animations.play('stop')
   }
 
   land.tilePosition.x = -game.camera.x
