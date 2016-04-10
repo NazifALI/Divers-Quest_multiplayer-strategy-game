@@ -57,14 +57,12 @@ function create () {
   loop = timer.loop(Phaser.Timer.SECOND, PowerDec, this);
   
   // The base of our player
-  var startX = Math.round(Math.random() * (1000) - 500)
-  var startY = Math.round(Math.random() * (1000) - 500)
+  var startX = Math.round(Math.random() * (1000) + 500)
+  var startY = Math.round(Math.random() * (600) + 400)
   player = game.add.sprite(startX, startY, 'dude')
   player.anchor.setTo(0.5, 0.5)
   game.physics.enable(player, Phaser.Physics.ARCADE)
   player.body.collideWorldBounds=true;
-  player.animations.add('move', [0, 1, 2, 3, 4, 5, 6, 7], 20, true)
-  player.animations.add('stop', [3], 20, true)
 
   //adding treasure
 	treasures = game.add.group();
@@ -86,7 +84,7 @@ function create () {
 		oxygen.scale.x = 0.2;
 		oxygen.scale.y = 0.2;
   //shark1
-  shark = game.add.sprite(400, 500, 'shark');
+  shark = game.add.sprite(250, 500, 'shark');
 		shark.anchor.setTo(0.5);
 		shark.scale.setTo(1.5,1.4);
 		game.physics.enable([shark],Phaser.Physics.ARCADE)
@@ -94,7 +92,7 @@ function create () {
 
 	    shark.body.collideWorldBounds = true;
 	    shark.body.gravity.y = -200;
-	    shark.body.bounce.set(1);
+	    shark.body.bounce.set(1,1);
 		//shark.mask = mask;
 
   // adding wreckage
@@ -104,12 +102,16 @@ function create () {
 		var obstacle = wreckage.create(100,100,'wreckageCode');
 		var obstacle2 = wreckage.create(100,300, 'wreckageCode');
 		var obstacle3 = wreckage.create(450,200, 'wreckageCode')
+		var obstacle4 = wreckage.create(450,250, 'wreckageCode')
+		var obstacle5 = wreckage.create(450,10, 'wreckageCode')
 		obstacle.anchor.setTo(0.5,0.5);
 		obstacle.body.immovable = true;
 		obstacle2.anchor.setTo(0.5,0.5);
 		obstacle2.body.immovable = true;
 		obstacle3.anchor.setTo(0.5,0.5);
 		obstacle3.body.immovable = true;		
+		obstacle4.body.immovable= true;
+		obstacle5.body.immovable = true;
   // treasures.mask= mask;
    mask.drawCircle(0,0,120)
   
@@ -126,12 +128,8 @@ function create () {
   player.bringToTop()
 
   game.camera.follow(player)
- // game.camera.deadzone = new Phaser.Rectangle(150, 150, 500, 300)	
- // game.camera.focusOnXY(0, 0)
-
   cursors = game.input.keyboard.createCursorKeys()
 
-  
   oxygenText = game.add.text(16, 16, 'Oxygen Level: 100%', {fintSize: '32px', fill: '#090'} );
 		powerText = game.add.text(16, 50, 'Power Level: 100%', {fintSize: '32px', fill: '#FF0'} );
 	oxygenText.fixedToCamera=true;
@@ -231,13 +229,33 @@ function onRemovePlayer (data) {
 }
 
 function update () {
+	game.physics.arcade.overlap(player, oxygenPowerUps, collectOxygen, null, this);
+	//game.physics.arcade.overlap(player, powerPowerUp, collectPower, null, this);
+	game.physics.arcade.overlap(player, treasures, winner, null, this);
+	game.physics.arcade.collide(player, wreckage);
 	//socket.emit('update state', {this.game});
   for (var i = 0; i < enemies.length; i++) {
     if (enemies[i].alive) {
       enemies[i].update()
     }
   }
+  if(oxygenLevel <= 0){
+			timer.pause;
+			endingText = game.add.text(player.x, player.y, 'YOU LOSE!', {fontSize: '130px', fill: '#090'} );
+			endingText.anchor.setTo(0.5,0.5);
+			game.paused = true;
+		}
 
+  if (game.input.keyboard.isDown(Phaser.Keyboard.B)){
+			// add explosion
+			if( player.scale.x > 0 ) {
+				explosion = game.add.sprite(player.x-100, player.y-50, 'kaboomCode');
+			} else {
+				explosion = game.add.sprite(player.x+30, player.y-50, 'kaboomCode');
+			}
+			explosion.animations.add('explode', [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24])
+			explosion.animations.play('explode', 40, false);
+		} 		
   if (cursors.left.isDown) {
     player.angle -= 4
 	player.body.velocity.x = -70;
