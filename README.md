@@ -1,5 +1,6 @@
 # 315-game-Divers_Quest
 A 2D multiplayer game about finding treasures in deep, dark oceans.
+Please download phaser.js from phaser website and add to vendor folder. Thanks
 
 **How to run the code?**  
 Download the master code files. Type: 
@@ -7,6 +8,7 @@ npm install
 in the command line. Then type 'node game.js' and the server will start running. 
 
 To run on multiple computer. Please make sure computer are connected to Tamu Vpn. Type the vpn ip address with port: 8080 so you can connect.
+
 **How to compile the code?**  
 change directory to lib foler. 
 Type "node game.js"
