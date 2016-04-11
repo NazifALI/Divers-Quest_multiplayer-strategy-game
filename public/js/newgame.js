@@ -33,7 +33,7 @@ var newGame ={
 
 
 	// Our tiled scrolling background
-	land = this.game.add.tileSprite(0, 0, 1000, 1000, 'background')
+	land = this.game.add.tileSprite(0, 0, 1000, 1000, 'back')
 	this.game.world.setBounds(0, 0, 1000, 1000)
 	land.fixedToCamera = true
 
