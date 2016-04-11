@@ -1,18 +1,6 @@
 
 /* global Phaser RemotePlayer io */
 
-var game = new Phaser.Game(800, 600, Phaser.CANVAS,' ', { preload: preload, create: create, update: update, render: render })
-
-function preload () {
-	  game.load.image('background','assets/back.png')
-	  game.load.image('treasure', 'assets/treasure.png');
-	  game.load.image('shark', 'assets/shark.png')
-	  game.load.image('oxygen', 'assets/oxygen.png')
-	  game.load.image('wreckage', 'assets/wreckage.png');
-	  game.load.spritesheet('dude', 'assets/diversprite.png', 256, 256)
-	  game.load.spritesheet('enemy', 'assets/dude.png', 64, 64)
-	  game.load.spritesheet('kaboomCode', 'assets/explosion.png', 64, 64);
-}
 
 var socket // Socket connection
 
@@ -35,37 +23,38 @@ var powerText;
 var endingText;
 var cursors
 
-function create () {
+var newGame ={
+ create:function () {
 	socket = io.connect()
-	mask = game.add.graphics(0,0);
+	mask = this.game.add.graphics(0,0);
 	mask.beginFill(0xffffff)
 
 	// Resize our game world to be a 1000 x 1000 square
 
 
 	// Our tiled scrolling background
-	land = game.add.tileSprite(0, 0, 1000, 1000, 'background')
-	game.world.setBounds(0, 0, 1000, 1000)
+	land = this.game.add.tileSprite(0, 0, 1000, 1000, 'background')
+	this.game.world.setBounds(0, 0, 1000, 1000)
 	land.fixedToCamera = true
 
 
 	//timer
-	timer = game.time.events;
+	timer = this.game.time.events;
 	loop = timer.loop(Phaser.Timer.SECOND, OxygenDec, this);
 	loop = timer.loop(Phaser.Timer.SECOND, PowerDec, this);
 
 	// The base of our player
 	var startX = Math.round(Math.random() * (1000) - 500)
 	var startY = Math.round(Math.random() * (1000) - 500)
-	player = game.add.sprite(startX, startY, 'dude')
+	player = this.game.add.sprite(startX, startY, 'dude')
 	player.anchor.setTo(0.5, 0.5)
-	game.physics.enable(player, Phaser.Physics.ARCADE)
+	this.game.physics.enable(player, Phaser.Physics.ARCADE)
 	player.body.collideWorldBounds=true;
 	player.scale.setTo(0.4)
 	player.animations.add('move', [0, 1, 2, 3, 4, 5, 6, 7])
 
 	//adding treasure
-	treasures = game.add.group();
+	treasures = this.game.add.group();
 	treasures.enableBody = true;
 	treasures.physicsBodyType = Phaser.Physics.ARCADE;
 	var treasure = treasures.create(200,500,'treasure');
@@ -75,7 +64,7 @@ function create () {
 	treasure.scale.y = 0.4;
 
 	// adding oxygen power up
-	oxygenPowerUps = game.add.group();
+	oxygenPowerUps = this.game.add.group();
 	oxygenPowerUps.enableBody = true;
 	oxygenPowerUps.physicsBodyType = Phaser.Physics.ARCADE;
 	var oxygen = oxygenPowerUps.create(500,450,'oxygen');
@@ -85,13 +74,13 @@ function create () {
 	oxygen.scale.y = 0.2;
 
 	// power power up
-	powerPowerUp = game.add.group();
+	powerPowerUp = this.game.add.group();
 
 	//shark1
-	shark = game.add.sprite(400, 500, 'shark');
+	shark = this.game.add.sprite(400, 500, 'shark');
 	shark.anchor.setTo(0.5);
 	shark.scale.setTo(1.5,1.4);
-	game.physics.enable([shark],Phaser.Physics.ARCADE)
+	this.game.physics.enable([shark],Phaser.Physics.ARCADE)
 	shark.physicsBodyType = Phaser.Physics.ARCADE;
 
 	shark.body.collideWorldBounds = true;
@@ -99,7 +88,7 @@ function create () {
 	shark.body.bounce.set(1);
 
 	// adding wreckage
-	wreckage = game.add.group();
+	wreckage = this.game.add.group();
 	wreckage.enableBody = true;
 	wreckage.physicsBodyType = Phaser.Physics.ARCADE;
 	var obstacle = wreckage.create(100,100,'wreckage');
@@ -124,7 +113,7 @@ function create () {
 	// create player's vision
 	mask.drawCircle(0,0,200)
 
-	game.physics.enable(player, Phaser.Physics.ARCADE)
+	this.game.physics.enable(player, Phaser.Physics.ARCADE)
 	// This will force it to decelerate and limit its speed
 	player.body.drag.x= 100;
 	player.body.drag.y= 100;
@@ -135,17 +124,110 @@ function create () {
 
 	player.bringToTop()
 
-	game.camera.follow(player)
+	this.game.camera.follow(player)
 
-	cursors = game.input.keyboard.createCursorKeys()
+	cursors = this.game.input.keyboard.createCursorKeys()
 
-	oxygenText = game.add.text(16, 16, 'Oxygen Level: 100%', {fintSize: '32px', fill: '#090'} );
-	powerText = game.add.text(16, 50, 'Power Level: 100%', {fintSize: '32px', fill: '#FF0'} );
+	oxygenText = this.game.add.text(16, 16, 'Oxygen Level: 100%', {fintSize: '32px', fill: '#090'} );
+	powerText = this.game.add.text(16, 50, 'Power Level: 100%', {fintSize: '32px', fill: '#FF0'} );
 	oxygenText.fixedToCamera=true;
 	powerText.fixedToCamera=true;
 	
 	// Start listening for events
 	setEventHandlers()
+},
+ update: function () {
+
+	this.game.physics.arcade.overlap(player, oxygenPowerUps, collectOxygen, null, this);
+	this.game.physics.arcade.overlap(player, powerPowerUp, collectPower, null, this);
+	this.game.physics.arcade.overlap(player, treasures, winner, null, this);
+	this.game.physics.arcade.collide(player, wreckage);
+
+	if (checkOverlap(shark, player)){
+		oxygenLevel -= .25;
+		oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
+	}
+
+	//socket.emit('update state', {this.game});
+	for (var i = 0; i < allPlayers.length; i++) {
+		if (allPlayers[i].alive) {
+			allPlayers[i].update()
+		}
+	}
+
+	// for left and right movement. The nested if statements check if Spacebar is pressed. If so the diver swims faster
+	if (cursors.left.isDown) {
+		if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+			player.body.velocity.x = -200;
+			player.scale.x = -0.4;
+			player.animations.play('move', 100, false);
+			oxygenLevel -= 0.15;
+			oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
+		} else {
+			player.body.velocity.x = -70;
+			player.scale.x = -0.4;
+			player.animations.play('move', 10, false);
+		}
+	} else if (cursors.right.isDown) {
+		if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+			player.body.velocity.x = 200;
+			player.scale.x = 0.4;
+			player.animations.play('move', 100, false);
+			oxygenLevel -= 0.15;
+			oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
+		} else {
+			player.body.velocity.x = 70;
+			player.scale.x = 0.4;
+			player.animations.play('move', 10, false);
+		}
+	}
+
+	// for up and down movement. The nested if statements check if Spacebar is pressed. If so the diver swims faster
+	if (cursors.up.isDown) {
+		if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+			player.body.velocity.y = -150;
+			player.animations.play('move', 100, false);
+			oxygenLevel -= 0.15;
+			oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';	
+		} else {
+			player.body.velocity.y = -70;
+			player.animations.play('move', 10, false);
+		}
+	} else if (cursors.down.isDown) {
+		if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+			player.body.velocity.y = 150;
+			player.animations.play('move', 100, false);
+			oxygenLevel -= 0.15;
+			oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
+		} else{
+			player.body.velocity.y= 70;
+			player.animations.play('move', 10, false);
+		}
+	}
+
+	if (player.scale.x > 0){
+		mask.x = player.x-50;
+	} else {
+		mask.x = player.x+50;
+	}
+	
+	mask.y = player.y;
+
+	land.tilePosition.x = -this.game.camera.x
+	land.tilePosition.y = -this.game.camera.y
+
+	mask.x=player.x;
+	mask.y=player.y;
+
+	socket.emit('move player', { x: player.x, y: player.y })
+
+	if (oxygenLevel <= 0 || powerLevel == 0){
+		 this.game.add.text(player.x, player.y, 'You Lose!', {fontSize: '48px', fill: '#F30'});
+		 player.kill();
+		 this.game.paused = true;
+	}
+}
+
 }
 
 var setEventHandlers = function () {
@@ -235,97 +317,6 @@ function onRemovePlayer (data) {
 	allPlayers.splice(allPlayers.indexOf(removePlayer), 1)
 }
 
-function update () {
-
-	game.physics.arcade.overlap(player, oxygenPowerUps, collectOxygen, null, this);
-	game.physics.arcade.overlap(player, powerPowerUp, collectPower, null, this);
-	game.physics.arcade.overlap(player, treasures, winner, null, this);
-	game.physics.arcade.collide(player, wreckage);
-
-	if (checkOverlap(shark, player)){
-		oxygenLevel -= .25;
-		oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
-	}
-
-	//socket.emit('update state', {this.game});
-	for (var i = 0; i < allPlayers.length; i++) {
-		if (allPlayers[i].alive) {
-			allPlayers[i].update()
-		}
-	}
-
-	// for left and right movement. The nested if statements check if Spacebar is pressed. If so the diver swims faster
-	if (cursors.left.isDown) {
-		if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-			player.body.velocity.x = -200;
-			player.scale.x = -0.4;
-			player.animations.play('move', 100, false);
-			oxygenLevel -= 0.15;
-			oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
-		} else {
-			player.body.velocity.x = -70;
-			player.scale.x = -0.4;
-			player.animations.play('move', 10, false);
-		}
-	} else if (cursors.right.isDown) {
-		if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-			player.body.velocity.x = 200;
-			player.scale.x = 0.4;
-			player.animations.play('move', 100, false);
-			oxygenLevel -= 0.15;
-			oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
-		} else {
-			player.body.velocity.x = 70;
-			player.scale.x = 0.4;
-			player.animations.play('move', 10, false);
-		}
-	}
-
-	// for up and down movement. The nested if statements check if Spacebar is pressed. If so the diver swims faster
-	if (cursors.up.isDown) {
-		if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-			player.body.velocity.y = -150;
-			player.animations.play('move', 100, false);
-			oxygenLevel -= 0.15;
-			oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';	
-		} else {
-			player.body.velocity.y = -70;
-			player.animations.play('move', 10, false);
-		}
-	} else if (cursors.down.isDown) {
-		if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-			player.body.velocity.y = 150;
-			player.animations.play('move', 100, false);
-			oxygenLevel -= 0.15;
-			oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
-		} else{
-			player.body.velocity.y= 70;
-			player.animations.play('move', 10, false);
-		}
-	}
-
-	if (player.scale.x > 0){
-		mask.x = player.x-50;
-	} else {
-		mask.x = player.x+50;
-	}
-	
-	mask.y = player.y;
-
-	land.tilePosition.x = -game.camera.x
-	land.tilePosition.y = -game.camera.y
-
-	mask.x=player.x;
-	mask.y=player.y;
-
-	socket.emit('move player', { x: player.x, y: player.y })
-
-	if (oxygenLevel <= 0 || powerLevel == 0){
-		 game.add.text(player.x, player.y, 'You Lose!', {fontSize: '48px', fill: '#F30'});
-		 player.kill();
-		 game.paused = true;
-	}
-}
 
 function render () {
 }
