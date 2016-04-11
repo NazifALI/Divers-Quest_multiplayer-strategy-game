@@ -122,7 +122,7 @@ function create () {
     land.mask=mask;
 
 
-   mask.drawCircle(0,0,120)
+   mask.drawCircle(0,0,200)
   
   game.physics.enable(player, Phaser.Physics.ARCADE)
   // This will force it to decelerate and limit its speed
