@@ -5,10 +5,10 @@ var game = new Phaser.Game(800, 600, Phaser.CANVAS,' ', { preload: preload, crea
 
 function preload () {
 	  game.load.image('background','assets/back.png')
-	  game.load.image('treasure', 'assets/Treasure.png');
+	  game.load.image('treasure', 'assets/treasure.png');
 	  game.load.image('shark', 'assets/shark.png')
 	  game.load.image('oxygen', 'assets/oxygen.png')
-	  game.load.image('wreckage', 'assets/Wreckage.png');
+	  game.load.image('wreckage', 'assets/wreckage.png');
 	  game.load.spritesheet('dude', 'assets/diversprite.png', 256, 256)
 	  game.load.spritesheet('enemy', 'assets/dude.png', 64, 64)
 	  game.load.spritesheet('kaboomCode', 'assets/explosion.png', 64, 64);
@@ -254,53 +254,60 @@ function update () {
 		}
 	}
 
+	// for left and right movement. The nested if statements check if Spacebar is pressed. If so the diver swims faster
 	if (cursors.left.isDown) {
-		player.body.velocity.x = -70;
-		player.scale.x = -0.4;
-		player.animations.play('move', 10, false);
+		if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+			player.body.velocity.x = -200;
+			player.scale.x = -0.4;
+			player.animations.play('move', 100, false);
+			oxygenLevel -= 0.15;
+			oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
+		} else {
+			player.body.velocity.x = -70;
+			player.scale.x = -0.4;
+			player.animations.play('move', 10, false);
+		}
 	} else if (cursors.right.isDown) {
-		player.body.velocity.x = 70;
-		player.scale.x = 0.4;
-		player.animations.play('move', 10, false);
+		if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+			player.body.velocity.x = 200;
+			player.scale.x = 0.4;
+			player.animations.play('move', 100, false);
+			oxygenLevel -= 0.15;
+			oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
+		} else {
+			player.body.velocity.x = 70;
+			player.scale.x = 0.4;
+			player.animations.play('move', 10, false);
+		}
 	}
 
+	// for up and down movement. The nested if statements check if Spacebar is pressed. If so the diver swims faster
 	if (cursors.up.isDown) {
-		player.body.velocity.y = -70;
-		//player.animations.play('move', 10, false);
-	} else
-	if (cursors.down.isDown) {
-		player.body.velocity.y= 70;
-		//player.animations.play('move', 10, false);
+		if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+			player.body.velocity.y = -150;
+			player.animations.play('move', 100, false);
+			oxygenLevel -= 0.15;
+			oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';	
+		} else {
+			player.body.velocity.y = -70;
+			player.animations.play('move', 10, false);
+		}
+	} else if (cursors.down.isDown) {
+		if (game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
+			player.body.velocity.y = 150;
+			player.animations.play('move', 100, false);
+			oxygenLevel -= 0.15;
+			oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
+		} else{
+			player.body.velocity.y= 70;
+			player.animations.play('move', 10, false);
+		}
 	}
 
 	if (player.scale.x > 0){
 		mask.x = player.x-50;
 	} else {
 		mask.x = player.x+50;
-	}
-	if (game.input.keyboard.isDown(Phaser.Keyboard.LEFT)&&game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)){
-		player.body.velocity.x = -200;
-		player.scale.x = -0.4;
-		//player.animations.play('move', 100, false);
-		oxygenLevel -= 0.15;
-		oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
-	}
-	if (game.input.keyboard.isDown(Phaser.Keyboard.RIGHT)&&game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)){
-		player.body.velocity.x = 200;
-		player.scale.x = 0.4;
-		//player.animations.play('move', 100, false);
-		oxygenLevel -= 0.15;
-		oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
-	}
-	if (game.input.keyboard.isDown(Phaser.Keyboard.UP)&&game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)){
-		player.body.velocity.y = -150;
-		oxygenLevel -= 0.15;
-		oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
-	}
-	if (game.input.keyboard.isDown(Phaser.Keyboard.DOWN)&&game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)){
-		player.body.velocity.y = 150;
-		oxygenLevel -= 0.15;
-		oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
 	}
 	
 	mask.y = player.y;
