@@ -1,20 +1,19 @@
 # 315-game-Divers_Quest
-A 2D multiplayer game about finding treasures in deep, dark oceans.
-Please download phaser.js from phaser website and add to vendor folder. Thanks
+A 2D multiplayer game about finding treasures in deep, dark oceans.  
 
 **How to run the code?**  
-Download the master code files. Type: 
-npm install
-in the command line. Then type 'node game.js' and the server will start running. 
-
-To run on multiple computer. Please make sure computer are connected to Tamu Vpn. Type the vpn ip address with port: 8080 so you can connect.
+First make sure you are connected to the TAMU VPN, then download all the code files in the master branch on compute.cs.tamu.edu server. Type: 
+'node game.js'  
+in the command line and the server will start running. To play the game go to Google Chrome and type "compute.cs.tamu.edu:20202" in the address bar from any computer, and the game screen would start.   
+OR  
+To run on multiple computer. Please make sure computer are connected to Tamu Vpn. Type the vpn ip address with port: 20202 so you can connect.
 
 **How to compile the code?**  
-change directory to lib foler. 
+Change directory to lib folder. 
 Type "node game.js"
 
 **Repository Structure:**  
-lib folder has the server side files which manages connections to all the players. public folder has the client side of the code. Assets folder inside public directory has all the images used in the game interface, and phaser.js contains the gaming engine i.e. the Phaser API.
+lib folder has the server side files which manages connections to all the players. public folder has the client side of the code. Assets folder inside public directory has all the images used in the game interface, and the vendor folder contains the phaser gaming engine i.e. the Phaser API.
 
 **Team Members:**  
 Gilberto Cruz   gilbertcruz@tamu.edu  
