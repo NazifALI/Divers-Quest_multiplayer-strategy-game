@@ -2,13 +2,16 @@
 A 2D multiplayer game about finding treasures in deep, dark oceans.
 
 **How to run the code?**  
-To run the code, download the github zip file and extract it. Then drag the index.html file into Chrome browser and the game interface should pop up. Then Play!
+Download the master code files in the compute.cs.tamu.edu server. Go to the 'server' directory and install the following modules by typing  
+npm install ecstatic  
+npm install socket.io  
+in the command line. Then type 'node game.js' and the server will start running. Go to the browser and type the url 'compute.cs.tamu.edu:20202' and the game screen will show up.
 
 **How to compile the code?**  
-Since the server side of the code has not yet been integrated with the game. There is no need to compile the code.
+To compile the code type 'node game.js' in the server directory
 
 **Repository Structure:**  
-Server folder has the serverGame.js file which manages connections to all the players. main.js contains the client side of the code, while index.html has the html code linking to the client code. Assets folder has all the images used in the game interface, and phaser.js contains the gaming engine i.e. the Phaser API.
+Server folder has the game.js file which manages connections to all the players. Client folder has the game.js file which contains the client side of the code. Assets folder has all the images used in the game interface, and phaser.js contains the gaming engine i.e. the Phaser API.
 
 **Team Members:**  
 Gilberto Cruz   gilbertcruz@tamu.edu  
