@@ -44,8 +44,8 @@ var newGame ={
 	loop = timer.loop(Phaser.Timer.SECOND, PowerDec, this);
 
 	// The base of our player
-	var startX = Math.round(Math.random() * (1000) - 500)
-	var startY = Math.round(Math.random() * (1000) - 500)
+	var startX = Math.round(Math.random() * (1000) + 500)
+	var startY = Math.round(Math.random() * (600) + 400)
 	player = this.game.add.sprite(startX, startY, 'dude')
 	player.anchor.setTo(0.5, 0.5)
 	this.game.physics.enable(player, Phaser.Physics.ARCADE)
