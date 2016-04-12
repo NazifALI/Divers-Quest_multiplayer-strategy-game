@@ -14,7 +14,7 @@ preload.prototype = {
         this.game.load.image('treasure', 'assets/treasure.png');
         this.game.load.image('shark', 'assets/shark.png')
         this.game.load.image('oxygen', 'assets/oxygen.png')
-        this.game.load.image('wreckage', 'assets/Wreckage.png')
+        this.game.load.image('wreckage', 'assets/wreckage.png')
         this.game.load.spritesheet('enemy', 'assets/dude.png', 64, 64)
         this.game.load.spritesheet('dude', 'assets/diversprite.png', 256, 256)
         this.game.load.spritesheet('kaboomCode', 'assets/explosion.png', 64, 64);
