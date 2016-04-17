@@ -13,6 +13,10 @@ var player
 var allPlayers
 var loop
 
+var torpedoes;
+var torpedoTime = 0;
+var ammo = 4;
+
 var currentSpeed = 0
 var timer;
 var loop;
@@ -24,19 +28,16 @@ var endingText;
 var cursors
 
 var newGame ={
- create:function () {
+create:function () {
 	socket = io.connect()
 	mask = this.game.add.graphics(0,0);
-	mask.beginFill(0xffffff)
-
+	mask.beginFill(0xffffff);
+	
 	// Resize our game world to be a 1000 x 1000 square
-
-
 	// Our tiled scrolling background
 	land = this.game.add.tileSprite(0, 0, 1000, 1000, 'back')
 	this.game.world.setBounds(0, 0, 1000, 1000)
 	land.fixedToCamera = true
-
 
 	//timer
 	timer = this.game.time.events;
@@ -52,6 +53,12 @@ var newGame ={
 	player.body.collideWorldBounds=true;
 	player.scale.setTo(0.4)
 	player.animations.add('move', [0, 1, 2, 3, 4, 5, 6, 7])
+	
+	// adding physics to player. This will force it to decelerate and limit its speed
+	//this.game.physics.enable(player, Phaser.Physics.ARCADE)
+	player.body.drag.x= 100;
+	player.body.drag.y= 100;
+	player.body.collideWorldBounds = true
 
 	//adding treasure
 	treasures = this.game.add.group();
@@ -74,13 +81,13 @@ var newGame ={
 	oxygen.scale.y = 0.2;
 
 	// power power up
-	powerPowerUp = this.game.add.group();
+	powerPowerUps = this.game.add.group();
 
 	//shark1
 	shark = this.game.add.sprite(400, 500, 'shark');
-	shark.anchor.setTo(0.5);
-	shark.scale.setTo(1.5,1.4);
-	this.game.physics.enable([shark],Phaser.Physics.ARCADE)
+	shark.scale.setTo(1);
+	shark.anchor.setTo(0.25);
+	this.game.physics.enable(shark,Phaser.Physics.ARCADE)
 	shark.physicsBodyType = Phaser.Physics.ARCADE;
 
 	shark.body.collideWorldBounds = true;
@@ -90,16 +97,27 @@ var newGame ={
 	// adding wreckage
 	wreckage = this.game.add.group();
 	wreckage.enableBody = true;
+	//wreckage.anchor.setTo(0.5);
 	wreckage.physicsBodyType = Phaser.Physics.ARCADE;
 	var obstacle = wreckage.create(100,100,'wreckage');
 	var obstacle2 = wreckage.create(100,300, 'wreckage');
 	var obstacle3 = wreckage.create(450,200, 'wreckage')
-	obstacle.anchor.setTo(0.5,0.5);
+	obstacle.anchor.setTo(0.25,0.25);
 	obstacle.body.immovable = true;
-	obstacle2.anchor.setTo(0.5,0.5);
+	obstacle2.anchor.setTo(0.25,0.25);
 	obstacle2.body.immovable = true;
-	obstacle3.anchor.setTo(0.5,0.5);
+	obstacle3.anchor.setTo(0.25,0.25);
 	obstacle3.body.immovable = true;		
+	
+	// adding torpedo
+	torpedoes = game.add.group();
+	torpedoes.enableBody = true;
+	torpedoes.physicsBodyType = Phaser.Physics.ARCADE;
+	//torpedoes.createMultiple(30, 'torpedo');
+	torpedoes.setAll('anchor.x', 1);
+	torpedoes.setAll('anchor.y', 1);
+	torpedoes.setAll('outOfBoundsKill', true);
+	torpedoes.setAll('checkWorldBounds', true);
 	
 	//mask all objects
 	obstacle.mask = mask;
@@ -109,15 +127,10 @@ var newGame ={
 	treasure.mask = mask;
 	shark.mask = mask;
 	oxygen.mask = mask;
+	torpedoes.mask = mask;
 	
 	// create player's vision
-	mask.drawCircle(0,0,200)
-
-	this.game.physics.enable(player, Phaser.Physics.ARCADE)
-	// This will force it to decelerate and limit its speed
-	player.body.drag.x= 100;
-	player.body.drag.y= 100;
-	player.body.collideWorldBounds = true
+	mask.drawCircle(0,0,2000)
 
 	// holds other players
 	allPlayers = []
@@ -136,17 +149,21 @@ var newGame ={
 	// Start listening for events
 	setEventHandlers()
 },
- update: function () {
+
+update: function () {
 
 	this.game.physics.arcade.overlap(player, oxygenPowerUps, collectOxygen, null, this);
-	this.game.physics.arcade.overlap(player, powerPowerUp, collectPower, null, this);
+	this.game.physics.arcade.overlap(player, powerPowerUps, collectPower, null, this);
 	this.game.physics.arcade.overlap(player, treasures, winner, null, this);
 	this.game.physics.arcade.collide(player, wreckage);
+	game.physics.arcade.overlap(torpedoes, wreckage, destroyWreckage, null, this);
+	game.physics.arcade.overlap(torpedoes, shark, destroyShark, null, this);
+	game.physics.arcade.overlap(player, shark, sharkHurts, null, this);
 
-	if (checkOverlap(shark, player)){
-		oxygenLevel -= .25;
-		oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
-	}
+	// if (checkOverlap(shark, player)){
+		// oxygenLevel -= .25;
+		// oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
+	// }
 
 	//socket.emit('update state', {this.game});
 	for (var i = 0; i < allPlayers.length; i++) {
@@ -205,6 +222,23 @@ var newGame ={
 		}
 	}
 
+	// if left mouse button is pressed
+	if(game.input.activePointer.isDown){
+		// check if there is ammo left
+		if(game.time.now > torpedoTime && ammo > 0){
+			// create a torpedo and fire in the direction of pointer
+			var torpedo = torpedoes.create(0,0,'torpedo');
+			torpedo.scale.setTo(-0.3, 0.3);
+			torpedo.reset(player.x, player.y);
+			torpedo.anchor.setTo(0.5,0.5);
+			torpedo.rotation = game.physics.arcade.angleToPointer(torpedo);
+			torpedo.body.velocity.x = 200 * Math.cos(torpedo.angle / 180 * Math.PI);
+			torpedo.body.velocity.y = 200 * Math.sin(torpedo.angle / 180 * Math.PI);
+			torpedoTime = game.time.now + 500;
+			ammo -= 1;
+		}
+	}
+	
 	if (player.scale.x > 0){
 		mask.x = player.x-50;
 	} else {
@@ -212,6 +246,7 @@ var newGame ={
 	}
 	
 	mask.y = player.y;
+	console.log("x=%d  y=%d", shark.x, shark.y);
 
 	land.tilePosition.x = -this.game.camera.x
 	land.tilePosition.y = -this.game.camera.y
@@ -321,10 +356,15 @@ function onRemovePlayer (data) {
 function render () {
 }
 
-function checkOverlap(shark, player){
-	var boundsA = shark.getBounds();
-	var boundsB = player.getBounds();
-	return Phaser.Rectangle.intersects(boundsA, boundsB);
+// function checkOverlap(shark, player){
+	// var boundsA = shark.getBounds();
+	// var boundsB = player.getBounds();
+	// return Phaser.Rectangle.intersects(boundsA, boundsB);
+// }
+
+function sharkHurts(player, shark) {
+	oxygenLevel -= .25;
+	oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
 }
 
 function OxygenDec() {
@@ -351,6 +391,35 @@ function winner(player, treasure){
 	endingText = game.add.text(0, 300, 'YOU WIN!', {fontSize: '150px', fill: '#090'} );
 	treasure.kill();
 	game.paused = true;
+}
+
+function destroyWreckage( torpedo, obstacle){
+	console.log(torpedo.x);
+	console.log(torpedo.y);
+	torpedo.kill();
+	obstacle.kill();
+	
+	//adding explosion
+	explosion = game.add.sprite(player.x, player.y, 'kaboom');
+	explosion.scale.setTo(2);
+	explosion.animations.add('explode', [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24])
+	explosion.reset(obstacle.x, obstacle.y);
+	explosion.animations.play('explode', 30, false);
+}
+
+function destroyShark( torpedo, shark){
+	console.log(torpedo.x);
+	console.log(torpedo.y);
+	torpedo.kill();
+	shark.kill();
+	
+	//adding explosion
+	explosion = game.add.sprite(player.x, player.y, 'kaboom');
+	explosion.anchor.setTo(0.5);
+	explosion.scale.setTo(2);
+	explosion.animations.add('explode', [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24])
+	explosion.reset(shark.x, shark.y);
+	explosion.animations.play('explode', 30, false);
 }
 
 // Find player by ID
