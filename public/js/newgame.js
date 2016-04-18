@@ -20,9 +20,12 @@ var ammo = 4;
 var currentSpeed = 0
 var timer;
 var loop;
+var oxygen;
 var oxygenLevel = 100;
 var oxygenText;
 var torpedoText;
+var treasureText;
+var treasureFound = 0;
 var endingText;
 var cursors
 
@@ -73,7 +76,7 @@ create:function () {
 	oxygenPowerUps = this.game.add.group();
 	oxygenPowerUps.enableBody = true;
 	oxygenPowerUps.physicsBodyType = Phaser.Physics.ARCADE;
-	var oxygen = oxygenPowerUps.create(500,450,'oxygen');
+	oxygen = oxygenPowerUps.create(500,450,'oxygen');
 	oxygen.anchor.setTo(0.5,0.5);
 	oxygen.body.immovable = false;
 	oxygen.scale.x = 0.2;
@@ -89,8 +92,7 @@ create:function () {
 	torpedoCollect.scale.setTo(-0.3, 0.3);
 
 
-
-	//shark1
+	//shark
 	shark = this.game.add.sprite(400, 500, 'shark');
 	shark.scale.setTo(1);
 	shark.anchor.setTo(0.25);
@@ -150,6 +152,10 @@ create:function () {
 
 	oxygenText = this.game.add.text(16, 16, 'Oxygen Level: 100%', {fintSize: '32px', fill: '#090'} );
 	torpedoText = this.game.add.text(16, 50, 'Torpedoes Left: 4', {fintSize: '32px', fill: '#FF0'} );
+	treasureText = this.game.add.text(16, 84, 'Treasures: ' + treasureFound + '/3', {fintSize: '32px', fill: '#FF0'} );
+	oxygenText.fixedToCamera=true;
+	torpedoText.fixedToCamera=true;
+	treasureText.fixedToCamera = true;
 	oxygenText.fixedToCamera=true;
 	torpedoText.fixedToCamera=true;
 	
@@ -167,12 +173,6 @@ update: function () {
 	game.physics.arcade.overlap(torpedoes, shark, destroyShark, null, this);
 	game.physics.arcade.overlap(player, shark, sharkHurts, null, this);
 
-	// if (checkOverlap(shark, player)){
-		// oxygenLevel -= .25;
-		// oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
-	// }
-
-	//socket.emit('update state', {this.game});
 	for (var i = 0; i < allPlayers.length; i++) {
 		if (allPlayers[i].alive) {
 			allPlayers[i].update()
@@ -253,7 +253,6 @@ update: function () {
 	}
 	
 	mask.y = player.y;
-	console.log("x=%d  y=%d", shark.x, shark.y);
 
 	land.tilePosition.x = -this.game.camera.x
 	land.tilePosition.y = -this.game.camera.y
@@ -261,6 +260,7 @@ update: function () {
 	mask.x=player.x;
 	mask.y=player.y;
 
+	// constantly send the player's position
 	socket.emit('move player', { x: player.x, y: player.y })
 
 	if (oxygenLevel <= 0 ){
@@ -289,6 +289,8 @@ var setEventHandlers = function () {
 	socket.on('remove player', onRemovePlayer)
 
 	socket.on('update state', onUpdateState)
+	
+	socket.on('oxygen collected', onOxygenCollected);
 }
 
 
@@ -359,6 +361,10 @@ function onRemovePlayer (data) {
 	allPlayers.splice(allPlayers.indexOf(removePlayer), 1)
 }
 
+function onOxygenCollected() {//data) {
+	console.log("Server has talked back!!");
+	oxygen.kill();
+}
 
 function render () {
 }
@@ -379,8 +385,12 @@ function OxygenDec() {
 	oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
 }
 
-
 function collectOxygen ( player, oxygen) {
+	console.log("OxygenID: %d", oxygen.ID);
+	
+	// Send local player data to the game serve
+	socket.emit('oxygen collected');
+	
 	oxygen.kill();
 	oxygenLevel = 100;
 	oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
@@ -393,9 +403,11 @@ function collecttorpedo ( player, torpedoCollect) {
 }
 
 function winner(player, treasure){
-	endingText = game.add.text(0, 300, 'YOU WIN!', {fontSize: '150px', fill: '#090'} );
+	//endingText = game.add.text(0, 300, 'YOU WIN!', {fontSize: '150px', fill: '#090'} );
+	treasureFound += 1;
+	treasureText.text =  'Treasures: ' + treasureFound + '/3'
 	treasure.kill();
-	game.paused = true;
+	//game.paused = true;
 }
 
 function destroyWreckage( torpedo, obstacle){
@@ -422,7 +434,7 @@ function destroyShark( torpedo, shark){
 	explosion = game.add.sprite(player.x, player.y, 'kaboom');
 	explosion.anchor.setTo(0.5);
 	explosion.scale.setTo(2);
-	explosion.animations.add('explode', [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24])
+	explosion.animations.add('explode', [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]);
 	explosion.reset(shark.x, shark.y);
 	explosion.animations.play('explode', 30, false);
 }
