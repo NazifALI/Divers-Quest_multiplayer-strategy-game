@@ -43,7 +43,7 @@ create:function () {
 
 	//timer
 	timer = this.game.time.events;
-	loop = timer.loop(Phaser.Timer.SECOND, OxygenDec, this);
+	loop = timer.loop(Phaser.Timer.SECOND*2, OxygenDec, this);
 
 
 	// The base of our player
@@ -376,19 +376,20 @@ function render () {
 // }
 
 function sharkHurts(player, shark) {
-	oxygenLevel -= .25;
+	oxygenLevel -= .15;
 	oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel * 100) / 100 + '%';
 
 	explosion = game.add.sprite(player.x, player.y, 'kaboom');
-	explosion.scale.setTo(2);
+	explosion.mask = mask;
+	explosion.scale.setTo(.5);
 	explosion.tint = 0xff0000;
 	explosion.animations.add('explode', [21,22,23,24])
 	explosion.reset(player.x, player.y);
-	explosion.animations.play('explode', 1, false);
+	explosion.animations.play('explode', 40, false);
 }
 
 function OxygenDec() {
-	oxygenLevel -= 2;
+	oxygenLevel -= 1;
 	oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel * 100) / 100 + '%';
 }
 
