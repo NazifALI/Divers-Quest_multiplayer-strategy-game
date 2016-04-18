@@ -186,7 +186,7 @@ update: function () {
 			player.scale.x = -0.4;
 			player.animations.play('move', 100, false);
 			oxygenLevel -= 0.15;
-			oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
+			oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel * 100) / 100 + '%';
 		} else {
 			player.body.velocity.x = -70;
 			player.scale.x = -0.4;
@@ -198,7 +198,7 @@ update: function () {
 			player.scale.x = 0.4;
 			player.animations.play('move', 100, false);
 			oxygenLevel -= 0.15;
-			oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
+			oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel * 100) / 100 + '%';
 		} else {
 			player.body.velocity.x = 70;
 			player.scale.x = 0.4;
@@ -212,7 +212,7 @@ update: function () {
 			player.body.velocity.y = -150;
 			player.animations.play('move', 100, false);
 			oxygenLevel -= 0.15;
-			oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';	
+			oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel * 100) / 100 + '%';	
 		} else {
 			player.body.velocity.y = -70;
 			player.animations.play('move', 10, false);
@@ -222,7 +222,7 @@ update: function () {
 			player.body.velocity.y = 150;
 			player.animations.play('move', 100, false);
 			oxygenLevel -= 0.15;
-			oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
+			oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel * 100) / 100 + '%';
 		} else{
 			player.body.velocity.y= 70;
 			player.animations.play('move', 10, false);
@@ -377,12 +377,19 @@ function render () {
 
 function sharkHurts(player, shark) {
 	oxygenLevel -= .25;
-	oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
+	oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel * 100) / 100 + '%';
+
+	explosion = game.add.sprite(player.x, player.y, 'kaboom');
+	explosion.scale.setTo(2);
+	explosion.tint = 0xff0000;
+	explosion.animations.add('explode', [21,22,23,24])
+	explosion.reset(player.x, player.y);
+	explosion.animations.play('explode', 1, false);
 }
 
 function OxygenDec() {
 	oxygenLevel -= 2;
-	oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
+	oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel * 100) / 100 + '%';
 }
 
 function collectOxygen ( player, oxygen) {
@@ -393,7 +400,7 @@ function collectOxygen ( player, oxygen) {
 	
 	oxygen.kill();
 	oxygenLevel = 100;
-	oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
+	oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel * 100) / 100 + '%';
 }
 
 function collecttorpedo ( player, torpedoCollect) {
