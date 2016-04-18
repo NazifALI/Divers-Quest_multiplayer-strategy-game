@@ -26,6 +26,9 @@ var oxygenText;
 var torpedoText;
 var treasureText;
 var treasureFound = 0;
+var opponentTreasureFound = 0;
+var treasures;
+var treasure;
 var endingText;
 var cursors
 
@@ -58,15 +61,15 @@ create:function () {
 	
 	// adding physics to player. This will force it to decelerate and limit its speed
 	//this.game.physics.enable(player, Phaser.Physics.ARCADE)
-	player.body.drag.x= 100;
-	player.body.drag.y= 100;
+	player.body.drag.x = 100;
+	player.body.drag.y = 100;
 	player.body.collideWorldBounds = true
 
 	//adding treasure
 	treasures = this.game.add.group();
 	treasures.enableBody = true;
 	treasures.physicsBodyType = Phaser.Physics.ARCADE;
-	var treasure = treasures.create(200,500,'treasure');
+	treasure = treasures.create(200,500,'treasure');
 	treasure.anchor.setTo(0.5,0.5);
 	treasure.body.immovable = false;
 	treasure.scale.x = 0.4;
@@ -90,7 +93,6 @@ create:function () {
 	torpedoCollect.anchor.setTo(0.5,0.5);
 	torpedoCollect.body.immovable = false;
 	torpedoCollect.scale.setTo(-0.3, 0.3);
-
 
 	//shark
 	shark = this.game.add.sprite(400, 500, 'shark');
@@ -139,7 +141,7 @@ create:function () {
 	torpedoes.mask = mask;
 	
 	// create player's vision
-	mask.drawCircle(0,0,2000)
+	mask.drawCircle(0,0,200)
 
 	// holds other players
 	allPlayers = []
@@ -175,7 +177,7 @@ update: function () {
 
 	for (var i = 0; i < allPlayers.length; i++) {
 		if (allPlayers[i].alive) {
-			allPlayers[i].update()
+			allPlayers[i].update();
 		}
 	}
 
@@ -291,6 +293,8 @@ var setEventHandlers = function () {
 	socket.on('update state', onUpdateState)
 	
 	socket.on('oxygen collected', onOxygenCollected);
+	
+	socket.on('treasure found', onTreasureFound);
 }
 
 
@@ -366,19 +370,35 @@ function onOxygenCollected() {//data) {
 	oxygen.kill();
 }
 
+function onTreasureFound(data) {
+	console.log("other player has found a treasure " + data.score);
+	opponentTreasureFound = data.score;
+	//treasure.kill();
+
+	if(opponentTreasureFound== 2){
+		treasure.kill();
+		//this.game.add.text(player.x, player.y, 'You Lose!', {fontSize: '48px', fill: '#F30'});
+		endingText = game.add.text(0, 400, 'YOU LOSE!', {fontSize: '100px', fill: '#F30'} );
+		game.paused = true;
+	}
+	else if(opponentTreasureFound == 1 && treasureFound < 1){
+		//spawn new treasure by simply reseting the coordinates
+		treasure.reset(200+400, 500-200);
+	}
+	else if (opponentTreasureFound == 1 && treasureFound == 1) {
+		treasure.reset(200+500, 500);
+	}
+	
+}
+
 function render () {
 }
 
-// function checkOverlap(shark, player){
-	// var boundsA = shark.getBounds();
-	// var boundsB = player.getBounds();
-	// return Phaser.Rectangle.intersects(boundsA, boundsB);
-// }
 
 function sharkHurts(player, shark) {
-	oxygenLevel -= .15;
+	oxygenLevel -= 0.15;
 	oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel * 100) / 100 + '%';
-
+	
 	explosion = game.add.sprite(player.x, player.y, 'kaboom');
 	explosion.mask = mask;
 	explosion.scale.setTo(.5);
@@ -411,11 +431,26 @@ function collecttorpedo ( player, torpedoCollect) {
 }
 
 function winner(player, treasure){
-	//endingText = game.add.text(0, 300, 'YOU WIN!', {fontSize: '150px', fill: '#090'} );
 	treasureFound += 1;
-	treasureText.text =  'Treasures: ' + treasureFound + '/3'
-	treasure.kill();
-	//game.paused = true;
+	
+	//let server know that the treasure has been found
+	socket.emit('treasure found', {score: treasureFound} );
+	
+	treasureText.text =  'Treasures: ' + treasureFound + '/3';
+	
+	if(treasureFound == 2){
+		treasure.kill();
+		endingText = game.add.text(0, 400, 'YOU WIN!', {fontSize: '150px', fill: '#090'} );
+		game.paused = true;
+	}
+	else if(treasureFound == 1 && opponentTreasureFound < 1){
+		//spawn new treasure by simply reseting the coordinates
+		treasure.reset(200+400, 500-200);
+	}
+	else if(treasureFound == 1 && opponentTreasureFound == 1){
+		//spawn new treasure by simply reseting the coordinates
+		treasure.reset(200+500, 500);
+	}
 }
 
 function destroyWreckage( torpedo, obstacle){

@@ -16,10 +16,10 @@ preload.prototype = {
         this.game.load.image('oxygen', 'assets/oxygen.png')
         this.game.load.image('wreckage', 'assets/wreckage.png')
 		game.load.image('torpedo', 'assets/torpedo.png');
-        this.game.load.spritesheet('enemy', 'assets/dude.png', 64, 64)
+        //this.game.load.spritesheet('enemy', 'assets/dude.png', 64, 64)
         this.game.load.spritesheet('dude', 'assets/diversprite.png', 256, 256)
         this.game.load.spritesheet('kaboom', 'assets/explosion.png', 64, 64);
-		
+		this.game.load.image('enemy', 'assets/dude.png');
 	},
   	create: function(){
 		this.game.state.start("GameTitle");
