@@ -22,8 +22,7 @@ var timer;
 var loop;
 var oxygenLevel = 100;
 var oxygenText;
-var powerLevel = 100;
-var powerText;
+var torpedoText;
 var endingText;
 var cursors
 
@@ -42,7 +41,7 @@ create:function () {
 	//timer
 	timer = this.game.time.events;
 	loop = timer.loop(Phaser.Timer.SECOND, OxygenDec, this);
-	loop = timer.loop(Phaser.Timer.SECOND, PowerDec, this);
+
 
 	// The base of our player
 	var startX = Math.round(Math.random() * (1000) + 500)
@@ -80,8 +79,16 @@ create:function () {
 	oxygen.scale.x = 0.2;
 	oxygen.scale.y = 0.2;
 
-	// power power up
-	powerPowerUps = this.game.add.group();
+	// torpedo power up
+	torpedoPowerUps = this.game.add.group();
+	torpedoPowerUps.enableBody = true;
+	torpedoPowerUps.physicsBodyType = Phaser.Physics.ARCADE;
+	var torpedoCollect = torpedoPowerUps.create(100,800, 'torpedo' );
+	torpedoCollect.anchor.setTo(0.5,0.5);
+	torpedoCollect.body.immovable = false;
+	torpedoCollect.scale.setTo(-0.3, 0.3);
+
+
 
 	//shark1
 	shark = this.game.add.sprite(400, 500, 'shark');
@@ -142,9 +149,9 @@ create:function () {
 	cursors = this.game.input.keyboard.createCursorKeys()
 
 	oxygenText = this.game.add.text(16, 16, 'Oxygen Level: 100%', {fintSize: '32px', fill: '#090'} );
-	powerText = this.game.add.text(16, 50, 'Power Level: 100%', {fintSize: '32px', fill: '#FF0'} );
+	torpedoText = this.game.add.text(16, 50, 'Torpedoes Left: 4', {fintSize: '32px', fill: '#FF0'} );
 	oxygenText.fixedToCamera=true;
-	powerText.fixedToCamera=true;
+	torpedoText.fixedToCamera=true;
 	
 	// Start listening for events
 	setEventHandlers()
@@ -153,7 +160,7 @@ create:function () {
 update: function () {
 
 	this.game.physics.arcade.overlap(player, oxygenPowerUps, collectOxygen, null, this);
-	this.game.physics.arcade.overlap(player, powerPowerUps, collectPower, null, this);
+	this.game.physics.arcade.overlap(player, torpedoPowerUps, collecttorpedo, null, this);
 	this.game.physics.arcade.overlap(player, treasures, winner, null, this);
 	this.game.physics.arcade.collide(player, wreckage);
 	game.physics.arcade.overlap(torpedoes, wreckage, destroyWreckage, null, this);
@@ -224,7 +231,7 @@ update: function () {
 
 	// if left mouse button is pressed
 	if(game.input.activePointer.isDown){
-		// check if there is ammo left
+		torpedoText.text = 'Torpedoes Left: ' + ammo;
 		if(game.time.now > torpedoTime && ammo > 0){
 			// create a torpedo and fire in the direction of pointer
 			var torpedo = torpedoes.create(0,0,'torpedo');
@@ -256,7 +263,7 @@ update: function () {
 
 	socket.emit('move player', { x: player.x, y: player.y })
 
-	if (oxygenLevel <= 0 || powerLevel == 0){
+	if (oxygenLevel <= 0 ){
 		 this.game.add.text(player.x, player.y, 'You Lose!', {fontSize: '48px', fill: '#F30'});
 		 player.kill();
 		 this.game.paused = true;
@@ -371,20 +378,18 @@ function OxygenDec() {
 	oxygenLevel -= 2;
 	oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
 }
-function PowerDec() {
-	powerLevel -= 1;
-	powerText.text = 'Power Level: ' + powerLevel + '%';
-}
+
 
 function collectOxygen ( player, oxygen) {
 	oxygen.kill();
 	oxygenLevel = 100;
 	oxygenText.text = 'Oxygen Level: ' + oxygenLevel + '%';
 }
-function collectPower ( player, power) {
-	power.kill();
-	powerLevel = 100;
-	powerText.text = 'Power Level: ' + powerLevel + '%';
+
+function collecttorpedo ( player, torpedoCollect) {
+	torpedoCollect.kill();
+	ammo += 2;
+	torpedoText.text = 'Torpedoes Left: ' + ammo;
 }
 
 function winner(player, treasure){
