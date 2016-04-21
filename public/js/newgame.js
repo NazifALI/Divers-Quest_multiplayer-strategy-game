@@ -155,9 +155,7 @@ create:function () {
 	torpedoes.setAll('checkWorldBounds', true);
 	
 	//mask all objects
-	// obstacle.mask = mask;
-	// obstacle2.mask = mask;
-	// obstacle3.mask = mask;
+	
 	wreckage.mask = mask; // to hide all wreckage
 	land.mask=mask;
 	treasure.mask = mask;
@@ -297,10 +295,16 @@ update: function () {
 
 	// check if oxygen level never falls below 0
 	if (oxygenLevel <= 0 ){
+<<<<<<< HEAD
 		endingText = this.game.add.text(60, 250, 'YOU LOSE!', {fontSize: '120px', fill: '#F30'}); 
 		endingText.fixedToCamera=true;
 		player.kill();
 		this.game.paused = true;
+=======
+		 this.game.add.text(game.camera.x +300, game.camera.y + 300, 'You Lose!', {fontSize: '48px', fill: '#F30'});
+		 player.kill();
+		 this.game.paused = true;
+>>>>>>> origin/master
 	}
 	
 	// create shark1's movement
@@ -512,9 +516,13 @@ function winner(player, treasure){
 	
 	if(treasureFound == 2){
 		treasure.kill();
+<<<<<<< HEAD
 		endingText = this.game.add.text(50, 250, 'YOU WIN!', {fontSize: '150px', fill: '#090'} );
 		endingText.fixedToCamera=true;
 		//this.game.add.text(16, 50, 'Torpedoes Left: 4', {fintSize: '32px', fill: '#FF0'} );
+=======
+		endingText = game.add.text(game.camera.x + 300, game.camera.y +300, 'YOU WIN!', {fontSize: '48px', fill: '#090'} );
+>>>>>>> origin/master
 		game.paused = true;
 	}
 	else if(treasureFound == 1 && opponentTreasureFound < 1){
