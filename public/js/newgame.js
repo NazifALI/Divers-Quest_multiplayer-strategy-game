@@ -8,28 +8,35 @@ var land
 var flashlight;
 var explosion;
 var wreckage;
-var player
+var player;
+var sharks;
+var shark1;
+var shark2;
+var oxygen;
+var treasures;
+var treasure;
+var torpedoes;
+var torpedoPowerUps;
+var torpedoCollect;
 
 var allPlayers
-var loop
+//var loop
 
-var torpedoes;
 var torpedoTime = 0;
 var ammo = 4;
 
 var currentSpeed = 0
 var timer;
 var loop;
-var oxygen;
-var oxygenLevel = 100;
+//var oxygen;
 var oxygenText;
 var torpedoText;
 var treasureText;
+var opponentTreasureText;
+var endingText;
 var treasureFound = 0;
 var opponentTreasureFound = 0;
-var treasures;
-var treasure;
-var endingText;
+var oxygenLevel = 100;
 var cursors
 
 var newGame ={
@@ -40,9 +47,9 @@ create:function () {
 	
 	// Resize our game world to be a 1000 x 1000 square
 	// Our tiled scrolling background
-	land = this.game.add.tileSprite(0, 0, 1000, 1000, 'back')
-	this.game.world.setBounds(0, 0, 1000, 1000)
-	land.fixedToCamera = true
+	land = this.game.add.tileSprite(0, 0, 1000, 1000, 'back');
+	this.game.world.setBounds(0, 0, 2000, 2000);
+	land.fixedToCamera = true;
 
 	//timer
 	timer = this.game.time.events;
@@ -50,17 +57,16 @@ create:function () {
 
 
 	// The base of our player
-	var startX = Math.round(Math.random() * (1000) + 500)
-	var startY = Math.round(Math.random() * (600) + 400)
-	player = this.game.add.sprite(startX, startY, 'dude')
+	//var startX = Math.round(Math.random() * (1000) + 500)
+	//var startY = Math.round(Math.random() * (600) + 400)
+	//player = this.game.add.sprite(startX, startY, 'dude')
+	player = this.game.add.sprite(100, 950, 'dude')
 	player.anchor.setTo(0.5, 0.5)
 	this.game.physics.enable(player, Phaser.Physics.ARCADE)
 	player.body.collideWorldBounds=true;
 	player.scale.setTo(0.4)
 	player.animations.add('move', [0, 1, 2, 3, 4, 5, 6, 7])
-	
 	// adding physics to player. This will force it to decelerate and limit its speed
-	//this.game.physics.enable(player, Phaser.Physics.ARCADE)
 	player.body.drag.x = 100;
 	player.body.drag.y = 100;
 	player.body.collideWorldBounds = true
@@ -69,56 +75,63 @@ create:function () {
 	treasures = this.game.add.group();
 	treasures.enableBody = true;
 	treasures.physicsBodyType = Phaser.Physics.ARCADE;
-	treasure = treasures.create(200,500,'treasure');
+	treasure = treasures.create(950,950,'treasure');
 	treasure.anchor.setTo(0.5,0.5);
 	treasure.body.immovable = false;
-	treasure.scale.x = 0.4;
-	treasure.scale.y = 0.4;
+	treasure.scale.setTo(0.4);
 
-	// adding oxygen power up
+	//adding oxygen power up
 	oxygenPowerUps = this.game.add.group();
 	oxygenPowerUps.enableBody = true;
 	oxygenPowerUps.physicsBodyType = Phaser.Physics.ARCADE;
 	oxygen = oxygenPowerUps.create(500,450,'oxygen');
 	oxygen.anchor.setTo(0.5,0.5);
 	oxygen.body.immovable = false;
-	oxygen.scale.x = 0.2;
-	oxygen.scale.y = 0.2;
+	oxygen.scale.setTo(0.2);
 
 	// torpedo power up
 	torpedoPowerUps = this.game.add.group();
 	torpedoPowerUps.enableBody = true;
 	torpedoPowerUps.physicsBodyType = Phaser.Physics.ARCADE;
-	var torpedoCollect = torpedoPowerUps.create(100,800, 'torpedo' );
+	torpedoCollect = torpedoPowerUps.create(100,800, 'torpedo' );
 	torpedoCollect.anchor.setTo(0.5,0.5);
 	torpedoCollect.body.immovable = false;
 	torpedoCollect.scale.setTo(-0.3, 0.3);
 
-	//shark
-	shark = this.game.add.sprite(400, 500, 'shark');
-	shark.scale.setTo(1);
-	shark.anchor.setTo(0.25);
-	this.game.physics.enable(shark,Phaser.Physics.ARCADE)
-	shark.physicsBodyType = Phaser.Physics.ARCADE;
-
-	shark.body.collideWorldBounds = true;
-	shark.body.gravity.y = -200;
-	shark.body.bounce.set(1);
-
 	// adding wreckage
 	wreckage = this.game.add.group();
 	wreckage.enableBody = true;
-	//wreckage.anchor.setTo(0.5);
 	wreckage.physicsBodyType = Phaser.Physics.ARCADE;
-	var obstacle = wreckage.create(100,100,'wreckage');
-	var obstacle2 = wreckage.create(100,300, 'wreckage');
-	var obstacle3 = wreckage.create(450,200, 'wreckage')
-	obstacle.anchor.setTo(0.25,0.25);
-	obstacle.body.immovable = true;
-	obstacle2.anchor.setTo(0.25,0.25);
-	obstacle2.body.immovable = true;
-	obstacle3.anchor.setTo(0.25,0.25);
-	obstacle3.body.immovable = true;		
+	createWreckage();
+	// var obstacle = wreckage.create(100,100,'wreckage');
+	// var obstacle2 = wreckage.create(100,300, 'wreckage');
+	// var obstacle3 = wreckage.create(450,200, 'wreckage')
+	// obstacle.anchor.setTo(0.25,0.25);
+	// obstacle.body.immovable = true;
+	// obstacle2.anchor.setTo(0.25,0.25);
+	// obstacle2.body.immovable = true;
+	// obstacle3.anchor.setTo(0.25,0.25);
+	// obstacle3.body.immovable = true;		
+	
+	//shark
+	sharks = this.game.add.group();
+	sharks.enableBody = true;
+	sharks.physicsBodyType = Phaser.Physics.ARCADE;
+	shark1 = sharks.create(200, 300, 'shark');
+	shark1.body.velocity.x = 300;
+	shark2 = sharks.create(300, 0, 'shark');
+	shark2.body.velocity.y = 500;
+	shark2.angle = 90;
+	// shark = this.game.add.sprite(400, 500, 'shark');
+	// shark.scale.setTo(1);
+	// shark.anchor.setTo(0.25);
+	// this.game.physics.enable(shark,Phaser.Physics.ARCADE)
+	// shark.physicsBodyType = Phaser.Physics.ARCADE;
+	// createSharks();
+
+	//shark.body.collideWorldBounds = true;
+	//shark.body.gravity.y = -200;
+	//shark.body.bounce.set(1);
 	
 	// adding torpedo
 	torpedoes = game.add.group();
@@ -131,17 +144,19 @@ create:function () {
 	torpedoes.setAll('checkWorldBounds', true);
 	
 	//mask all objects
-	obstacle.mask = mask;
-	obstacle2.mask = mask;
-	obstacle3.mask = mask;
+	// obstacle.mask = mask;
+	// obstacle2.mask = mask;
+	// obstacle3.mask = mask;
+	wreckage.mask = mask; // to hide all wreckage
 	land.mask=mask;
 	treasure.mask = mask;
-	shark.mask = mask;
-	oxygen.mask = mask;
+	sharks.mask = mask;
+	oxygenPowerUps.mask = mask;
+	torpedoPowerUps.mask = mask;
 	torpedoes.mask = mask;
 	
 	// create player's vision
-	mask.drawCircle(0,0,200)
+	mask.drawCircle(0,0,2000);
 
 	// holds other players
 	allPlayers = []
@@ -154,12 +169,14 @@ create:function () {
 
 	oxygenText = this.game.add.text(16, 16, 'Oxygen Level: 100%', {fintSize: '32px', fill: '#090'} );
 	torpedoText = this.game.add.text(16, 50, 'Torpedoes Left: 4', {fintSize: '32px', fill: '#FF0'} );
-	treasureText = this.game.add.text(16, 84, 'Treasures: ' + treasureFound + '/3', {fintSize: '32px', fill: '#FF0'} );
+	treasureText = this.game.add.text(16, 84, 'Treasures Found: ' + treasureFound + '/3', {fintSize: '32px', fill: '#FF0'} );
+	opponentTreasureText = this.game.add.text(16, 118, 'Opponent Treasures: ' + opponentTreasureFound + '/3', {fintSize: '32px', fill: '#FF0'} );
 	oxygenText.fixedToCamera=true;
 	torpedoText.fixedToCamera=true;
 	treasureText.fixedToCamera = true;
 	oxygenText.fixedToCamera=true;
 	torpedoText.fixedToCamera=true;
+	opponentTreasureText.fixedToCamera = true;
 	
 	// Start listening for events
 	setEventHandlers()
@@ -172,8 +189,8 @@ update: function () {
 	this.game.physics.arcade.overlap(player, treasures, winner, null, this);
 	this.game.physics.arcade.collide(player, wreckage);
 	game.physics.arcade.overlap(torpedoes, wreckage, destroyWreckage, null, this);
-	game.physics.arcade.overlap(torpedoes, shark, destroyShark, null, this);
-	game.physics.arcade.overlap(player, shark, sharkHurts, null, this);
+	game.physics.arcade.overlap(torpedoes, sharks, destroyShark, null, this);
+	game.physics.arcade.overlap(player, sharks, sharkHurts, null, this);
 
 	for (var i = 0; i < allPlayers.length; i++) {
 		if (allPlayers[i].alive) {
@@ -187,7 +204,7 @@ update: function () {
 			player.body.velocity.x = -200;
 			player.scale.x = -0.4;
 			player.animations.play('move', 100, false);
-			oxygenLevel -= 0.15;
+			oxygenLevel -= 0.01;
 			oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel * 100) / 100 + '%';
 		} else {
 			player.body.velocity.x = -70;
@@ -199,7 +216,7 @@ update: function () {
 			player.body.velocity.x = 200;
 			player.scale.x = 0.4;
 			player.animations.play('move', 100, false);
-			oxygenLevel -= 0.15;
+			oxygenLevel -= 0.01;
 			oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel * 100) / 100 + '%';
 		} else {
 			player.body.velocity.x = 70;
@@ -213,7 +230,7 @@ update: function () {
 		if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
 			player.body.velocity.y = -150;
 			player.animations.play('move', 100, false);
-			oxygenLevel -= 0.15;
+			oxygenLevel -= 0.01;
 			oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel * 100) / 100 + '%';	
 		} else {
 			player.body.velocity.y = -70;
@@ -223,7 +240,7 @@ update: function () {
 		if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
 			player.body.velocity.y = 150;
 			player.animations.play('move', 100, false);
-			oxygenLevel -= 0.15;
+			oxygenLevel -= 0.01;
 			oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel * 100) / 100 + '%';
 		} else{
 			player.body.velocity.y= 70;
@@ -248,28 +265,32 @@ update: function () {
 		}
 	}
 	
-	if (player.scale.x > 0){
-		mask.x = player.x-50;
+	// mask changes with position
+	if (player.scale.x < 0){
+		mask.x = player.x-60;
 	} else {
-		mask.x = player.x+50;
+		mask.x = player.x+60;
 	}
-	
 	mask.y = player.y;
 
 	land.tilePosition.x = -this.game.camera.x
 	land.tilePosition.y = -this.game.camera.y
 
-	mask.x=player.x;
-	mask.y=player.y;
+	//mask.x=player.x;
+	//mask.y=player.y;
 
-	// constantly send the player's position
-	socket.emit('move player', { x: player.x, y: player.y })
-
+	// check if oxygen level never falls below 0
 	if (oxygenLevel <= 0 ){
-		 this.game.add.text(player.x, player.y, 'You Lose!', {fontSize: '48px', fill: '#F30'});
+		 this.game.add.text((game.camera.x) / 2, ( game.camera.y) / 2, 'You Lose!', {fontSize: '48px', fill: '#F30'});
 		 player.kill();
 		 this.game.paused = true;
 	}
+	
+	// create shark1's movement
+	moveSharks();
+	
+	// constantly send the player's position
+	socket.emit('move player', { x: player.x, y: player.y })
 }
 
 }
@@ -293,6 +314,8 @@ var setEventHandlers = function () {
 	socket.on('update state', onUpdateState)
 	
 	socket.on('oxygen collected', onOxygenCollected);
+	
+	socket.on('torpedo collected', onTorpedoCollected);
 	
 	socket.on('treasure found', onTreasureFound);
 }
@@ -365,28 +388,49 @@ function onRemovePlayer (data) {
 	allPlayers.splice(allPlayers.indexOf(removePlayer), 1)
 }
 
-function onOxygenCollected() {//data) {
+function onOxygenCollected(data) {//data) {
 	console.log("Server has talked back!!");
 	oxygen.kill();
+	
+	// create new oxygen tank
+	//>>>> can add time here
+	oxygen = oxygenPowerUps.create(data.x,data.y,'oxygen');
+	oxygen.anchor.setTo(0.5,0.5);
+	oxygen.body.immovable = false;
+	oxygen.scale.setTo(0.2);
+	
+}
+
+function onTorpedoCollected(data) {
+	console.log("Server has talked back!!");
+	torpedoCollect.kill();
+	
+	// create new oxygen tank
+	//>>>> can add time here
+	torpedoCollect = torpedoPowerUps.create(data.x, data.y, 'torpedo' );
+	torpedoCollect.anchor.setTo(0.5,0.5);
+	torpedoCollect.body.immovable = false;
+	torpedoCollect.scale.setTo(-0.3, 0.3);
 }
 
 function onTreasureFound(data) {
 	console.log("other player has found a treasure " + data.score);
 	opponentTreasureFound = data.score;
+	opponentTreasureText.text = 'Opponent Treasures: ' + opponentTreasureFound + '/3';
 	//treasure.kill();
 
 	if(opponentTreasureFound== 2){
 		treasure.kill();
 		//this.game.add.text(player.x, player.y, 'You Lose!', {fontSize: '48px', fill: '#F30'});
-		endingText = game.add.text(0, 400, 'YOU LOSE!', {fontSize: '100px', fill: '#F30'} );
+		endingText = game.add.text((game.camera.x + game.camera.width) / 2, (game.camera.y + game.camera.height) / 2, 'YOU LOSE!', {fontSize: '100px', fill: '#F30'} );
 		game.paused = true;
 	}
 	else if(opponentTreasureFound == 1 && treasureFound < 1){
 		//spawn new treasure by simply reseting the coordinates
-		treasure.reset(200+400, 500-200);
+		treasure.reset(950, 50);
 	}
 	else if (opponentTreasureFound == 1 && treasureFound == 1) {
-		treasure.reset(200+500, 500);
+		treasure.reset(50, 50);
 	}
 	
 }
@@ -409,7 +453,7 @@ function sharkHurts(player, shark) {
 }
 
 function OxygenDec() {
-	oxygenLevel -= 1;
+	oxygenLevel -= 0.5;
 	oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel * 100) / 100 + '%';
 }
 
@@ -425,6 +469,9 @@ function collectOxygen ( player, oxygen) {
 }
 
 function collecttorpedo ( player, torpedoCollect) {
+	// let other players know that torpedo has been collected
+	socket.emit('torpedo collected');
+	
 	torpedoCollect.kill();
 	ammo += 2;
 	torpedoText.text = 'Torpedoes Left: ' + ammo;
@@ -436,20 +483,20 @@ function winner(player, treasure){
 	//let server know that the treasure has been found
 	socket.emit('treasure found', {score: treasureFound} );
 	
-	treasureText.text =  'Treasures: ' + treasureFound + '/3';
+	treasureText.text =  'Treasures Found: ' + treasureFound + '/3';
 	
 	if(treasureFound == 2){
 		treasure.kill();
-		endingText = game.add.text(0, 400, 'YOU WIN!', {fontSize: '150px', fill: '#090'} );
+		endingText = game.add.text((game.camera.x + game.camera.width) / 2, (game.camera.y + game.camera.height) / 2, 'YOU WIN!', {fontSize: '150px', fill: '#090'} );
 		game.paused = true;
 	}
 	else if(treasureFound == 1 && opponentTreasureFound < 1){
 		//spawn new treasure by simply reseting the coordinates
-		treasure.reset(200+400, 500-200);
+		treasure.reset(950, 50);
 	}
 	else if(treasureFound == 1 && opponentTreasureFound == 1){
 		//spawn new treasure by simply reseting the coordinates
-		treasure.reset(200+500, 500);
+		treasure.reset(50, 50);
 	}
 }
 
@@ -480,6 +527,71 @@ function destroyShark( torpedo, shark){
 	explosion.animations.add('explode', [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]);
 	explosion.reset(shark.x, shark.y);
 	explosion.animations.play('explode', 30, false);
+}
+
+function createWreckage() {
+	// wreckage beside first treasure
+	for(var x=0; x < 4; x++) {
+		var obstacle = wreckage.create( 950 - 70*x , 750, 'wreckage');
+		obstacle.anchor.setTo(0.25,0.25);
+		obstacle.body.immovable = true;
+	}
+	for(var y=0; y < 3; y++) {
+		var obstacle = wreckage.create( 800, 950 - 70*y, 'wreckage');
+		obstacle.anchor.setTo(0.25,0.25);
+		obstacle.body.immovable = true;
+	}
+	// create wreckage randomly on map within the 700 by 700 box
+	for( var i=0; i<60; i++) {
+		var X = 2000;
+		var Y = 200;
+		var size = 1;
+		var obstacle;
+		
+		while (X > 1400) {
+			X = Math.round(Math.random()*2000);
+		}
+		while (Y > 2000 || Y < 600) {
+			Y = Math.round(Math.random()*2000);
+		}
+		// create rocks of different sizes
+		while (size > 0.1 || size < 0.07) {
+			size = Math.random();
+		}
+		console.log(size);
+		if( Math.round(Math.random()) ) {
+			obstacle = wreckage.create( X, Y, 'rock');
+		} else {
+			obstacle = wreckage.create( X, Y, 'rock2');
+		}
+		obstacle.scale.setTo(size);
+		obstacle.anchor.setTo(0.5);
+		obstacle.body.immovable = true;
+	}	
+}
+
+function moveSharks() {
+	if (shark1.x < 200) {
+		shark1.x = 205;
+		shark1.body.velocity.x *= -1;
+		shark1.scale.x *= -1;
+	}
+	if (shark1.x > 1000) {
+		shark1.x = 990;
+		shark1.body.velocity.x *= -1;
+		shark1.scale.x *= -1;
+	}
+	
+	if(shark2.y > 1000) {
+		shark2.y = 990;
+		shark2.body.velocity.y *= -1;
+		shark2.angle = -90;
+	}
+	if(shark2.y < 0) {
+		shark2.y = 10;
+		shark2.body.velocity.y *= -1;
+		shark2.angle = 90;
+	}
 }
 
 // Find player by ID
