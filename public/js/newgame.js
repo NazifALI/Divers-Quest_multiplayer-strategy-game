@@ -82,15 +82,6 @@ create:function () {
 	player.body.drag.y = 100;
 	player.body.collideWorldBounds = true
 
-	//adding treasure
-	treasures = this.game.add.group();
-	treasures.enableBody = true;
-	treasures.physicsBodyType = Phaser.Physics.ARCADE;
-	treasure = treasures.create(950,950,'treasure');
-	treasure.anchor.setTo(0.5,0.5);
-	treasure.body.immovable = false;
-	treasure.scale.setTo(0.4);
-
 	//adding oxygen power up
 	oxygenPowerUps = this.game.add.group();
 	oxygenPowerUps.enableBody = true;
@@ -114,35 +105,30 @@ create:function () {
 	wreckage.enableBody = true;
 	wreckage.physicsBodyType = Phaser.Physics.ARCADE;
 	createWreckage();
-	// var obstacle = wreckage.create(100,100,'wreckage');
-	// var obstacle2 = wreckage.create(100,300, 'wreckage');
-	// var obstacle3 = wreckage.create(450,200, 'wreckage')
-	// obstacle.anchor.setTo(0.25,0.25);
-	// obstacle.body.immovable = true;
-	// obstacle2.anchor.setTo(0.25,0.25);
-	// obstacle2.body.immovable = true;
-	// obstacle3.anchor.setTo(0.25,0.25);
-	// obstacle3.body.immovable = true;		
+
+	//adding treasure
+	//doesn't have to be a group
+	treasures = this.game.add.group();
+	treasures.enableBody = true;
+	treasures.physicsBodyType = Phaser.Physics.ARCADE;
+	// socket.emit('treasure coordinates' );
+	treasure = treasures.create(1000,1000,'treasure');
+	treasure.anchor.setTo(0.5,0.5);
+	treasure.body.immovable = false;
+	treasure.scale.setTo(0.4);
+	createTreasureWreckage(1000, 1000);
 	
 	//shark
 	sharks = this.game.add.group();
 	sharks.enableBody = true;
 	sharks.physicsBodyType = Phaser.Physics.ARCADE;
 	shark1 = sharks.create(200, 300, 'shark');
-	shark1.body.velocity.x = 300;
+	shark1.body.velocity.x = 600;
+	shark1.anchor.setTo(0.5);
 	shark2 = sharks.create(300, 0, 'shark');
-	shark2.body.velocity.y = 500;
+	shark2.body.velocity.y = 900;
+	shark2.anchor.setTo(0.5);
 	shark2.angle = 90;
-	// shark = this.game.add.sprite(400, 500, 'shark');
-	// shark.scale.setTo(1);
-	// shark.anchor.setTo(0.25);
-	// this.game.physics.enable(shark,Phaser.Physics.ARCADE)
-	// shark.physicsBodyType = Phaser.Physics.ARCADE;
-	// createSharks();
-
-	//shark.body.collideWorldBounds = true;
-	//shark.body.gravity.y = -200;
-	//shark.body.bounce.set(1);
 	
 	// adding torpedo
 	torpedoes = game.add.group();
@@ -158,7 +144,7 @@ create:function () {
 	
 	wreckage.mask = mask; // to hide all wreckage
 	land.mask=mask;
-	treasure.mask = mask;
+	treasures.mask = mask;
 	sharks.mask = mask;
 	oxygenPowerUps.mask = mask;
 	torpedoPowerUps.mask = mask;
@@ -295,16 +281,13 @@ update: function () {
 
 	// check if oxygen level never falls below 0
 	if (oxygenLevel <= 0 ){
-<<<<<<< HEAD
 		endingText = this.game.add.text(60, 250, 'YOU LOSE!', {fontSize: '120px', fill: '#F30'}); 
 		endingText.fixedToCamera=true;
 		player.kill();
 		this.game.paused = true;
-=======
-		 this.game.add.text(game.camera.x +300, game.camera.y + 300, 'You Lose!', {fontSize: '48px', fill: '#F30'});
-		 player.kill();
-		 this.game.paused = true;
->>>>>>> origin/master
+		this.game.add.text(game.camera.x +300, game.camera.y + 300, 'You Lose!', {fontSize: '48px', fill: '#F30'});
+		player.kill();
+		this.game.paused = true;
 	}
 	
 	// create shark1's movement
@@ -446,17 +429,18 @@ function onTreasureFound(data) {
 	if(opponentTreasureFound== 2){
 		treasure.kill();
 		//this.game.add.text(player.x, player.y, 'You Lose!', {fontSize: '48px', fill: '#F30'});
-		endingText = game.add.text(60, 250, 'YOU LOSE!', {fontSize: '120px', fill: '#F30'} );
-		endingText.fixedToCamera=true;
+		endingText = game.add.text((game.camera.x + game.camera.width) / 2, (game.camera.y + game.camera.height) / 2, 'YOU LOSE!', {fontSize: '100px', fill: '#F30'} );
 		game.paused = true;
 	}
-	else if(opponentTreasureFound == 1 && treasureFound < 1){
+	else {// if(opponentTreasureFound == 1 && treasureFound < 1){
 		//spawn new treasure by simply reseting the coordinates
-		treasure.reset(950, 50);
+		treasure.reset(data.x, data.y);
 	}
-	else if (opponentTreasureFound == 1 && treasureFound == 1) {
-		treasure.reset(50, 50);
-	}
+	// else if (opponentTreasureFound == 1 && treasureFound == 1) {
+		// treasure.reset(data.x, data.y);
+	// }
+	
+	createTreasureWreckage(data.x, data.y);
 	
 }
 
@@ -509,29 +493,32 @@ function collecttorpedo ( player, torpedoCollect) {
 function winner(player, treasure){
 	treasureFound += 1;
 	
-	//let server know that the treasure has been found
-	socket.emit('treasure found', {score: treasureFound} );
+	// create coordinates for new place of treasure
+	var x = Math.round(Math.random()*2000);
+	var y = Math.round(Math.random()*2000);
+	while ( (Math.abs(x - treasure.x) < 700) || Math.abs(y - treasure.y) < 500 ) {
+		x = Math.round(Math.random()*2000);
+		y = Math.round(Math.random()*2000);
+	}
 	
 	treasureText.text =  'Treasures Found: ' + treasureFound + '/3';
 	
+	//let server know that the treasure has been found and send coordinates of new treasure
+	socket.emit('treasure found', {score: treasureFound, x: x, y: y} );
+	
+	createTreasureWreckage(x, y);
+	
 	if(treasureFound == 2){
 		treasure.kill();
-<<<<<<< HEAD
 		endingText = this.game.add.text(50, 250, 'YOU WIN!', {fontSize: '150px', fill: '#090'} );
 		endingText.fixedToCamera=true;
 		//this.game.add.text(16, 50, 'Torpedoes Left: 4', {fintSize: '32px', fill: '#FF0'} );
-=======
 		endingText = game.add.text(game.camera.x + 300, game.camera.y +300, 'YOU WIN!', {fontSize: '48px', fill: '#090'} );
->>>>>>> origin/master
 		game.paused = true;
 	}
-	else if(treasureFound == 1 && opponentTreasureFound < 1){
+	else {
 		//spawn new treasure by simply reseting the coordinates
-		treasure.reset(950, 50);
-	}
-	else if(treasureFound == 1 && opponentTreasureFound == 1){
-		//spawn new treasure by simply reseting the coordinates
-		treasure.reset(50, 50);
+		treasure.reset(x, y);
 	}
 
 	treasureCollect = game.add.audio('treasureCollect');
@@ -572,35 +559,15 @@ function destroyShark( torpedo, shark){
 }
 
 function createWreckage() {
-	// wreckage beside first treasure
-	for(var x=0; x < 4; x++) {
-		var obstacle = wreckage.create( 950 - 70*x , 750, 'wreckage');
-		obstacle.anchor.setTo(0.25,0.25);
-		obstacle.body.immovable = true;
-	}
-	for(var y=0; y < 3; y++) {
-		var obstacle = wreckage.create( 800, 950 - 70*y, 'wreckage');
-		obstacle.anchor.setTo(0.25,0.25);
-		obstacle.body.immovable = true;
-	}
-	// create wreckage randomly on map within the 700 by 700 box
 	for( var i=0; i<60; i++) {
-		var X = 2000;
-		var Y = 200;
+		var X = Math.round(Math.random()*2000);
+		var Y = Math.round(Math.random()*2000);
 		var size = 1;
 		var obstacle;
 		
-		while (X > 1400) {
-			X = Math.round(Math.random()*2000);
-		}
-		while (Y > 2000 || Y < 600) {
-			Y = Math.round(Math.random()*2000);
-		}
-		// create rocks of different sizes
 		while (size > 0.1 || size < 0.07) {
 			size = Math.random();
 		}
-		console.log(size);
 		if( Math.round(Math.random()) ) {
 			obstacle = wreckage.create( X, Y, 'rock');
 		} else {
@@ -613,26 +580,52 @@ function createWreckage() {
 }
 
 function moveSharks() {
-	if (shark1.x < 200) {
-		shark1.x = 205;
+	if (shark1.x < 400) {
+		shark1.x = 420;
 		shark1.body.velocity.x *= -1;
 		shark1.scale.x *= -1;
 	}
-	if (shark1.x > 1000) {
-		shark1.x = 990;
+	if (shark1.x > 2000) {
+		shark1.x = 1980;
 		shark1.body.velocity.x *= -1;
 		shark1.scale.x *= -1;
 	}
 	
-	if(shark2.y > 1000) {
-		shark2.y = 990;
+	if(shark2.y > 2000) {
+		shark2.y = 1980;
 		shark2.body.velocity.y *= -1;
 		shark2.angle = -90;
 	}
 	if(shark2.y < 0) {
-		shark2.y = 10;
+		shark2.y = 20;
 		shark2.body.velocity.y *= -1;
 		shark2.angle = 90;
+	}
+}
+
+function createTreasureWreckage(X, Y) {
+	// generates random wreckage around the treasure
+	for (var i=0; i<10; i++) {
+		var xd = Math.round(Math.random()*200);
+		var yd = Math.round(Math.random()*200);
+		var size = 2;
+		while( xd > 130 || xd < 50 || yd > 130 || yd < 50) {
+			xd = Math.round(Math.random()*200);
+			yd = Math.round(Math.random()*200);
+		}
+		if (Math.round(Math.random())) {
+			xd *= -1
+		}
+		if (Math.round(Math.random())) {
+			yd *= -1
+		}
+		while (size > 1 || size < 0.8) {
+			size = Math.random();
+		}
+		var obstacle = wreckage.create( X+xd , Y+yd, 'wreckage');
+		obstacle.anchor.setTo(0.25,0.25);
+		obstacle.scale.setTo(size);
+		obstacle.body.immovable = true;
 	}
 }
 
