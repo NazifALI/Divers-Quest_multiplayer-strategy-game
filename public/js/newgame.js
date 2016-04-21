@@ -18,6 +18,14 @@ var treasure;
 var torpedoes;
 var torpedoPowerUps;
 var torpedoCollect;
+var backgroundMusic;
+var oxygenMusic;
+var explosionSound;
+var pain;
+var punch;
+var heartbeat;
+var gunReload;
+var treasureCollect;
 
 var allPlayers
 //var loop
@@ -55,6 +63,9 @@ create:function () {
 	timer = this.game.time.events;
 	loop = timer.loop(Phaser.Timer.SECOND*2, OxygenDec, this);
 
+
+	backgroundMusic = game.add.audio('song');
+	backgroundMusic.play();
 
 	// The base of our player
 	//var startX = Math.round(Math.random() * (1000) + 500)
@@ -204,8 +215,8 @@ update: function () {
 			player.body.velocity.x = -200;
 			player.scale.x = -0.4;
 			player.animations.play('move', 100, false);
-			oxygenLevel -= 0.01;
-			oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel * 100) / 100 + '%';
+			oxygenLevel -= 0.05;
+			oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel) + '%';
 		} else {
 			player.body.velocity.x = -70;
 			player.scale.x = -0.4;
@@ -216,8 +227,8 @@ update: function () {
 			player.body.velocity.x = 200;
 			player.scale.x = 0.4;
 			player.animations.play('move', 100, false);
-			oxygenLevel -= 0.01;
-			oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel * 100) / 100 + '%';
+			oxygenLevel -= 0.05;
+			oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel) + '%';
 		} else {
 			player.body.velocity.x = 70;
 			player.scale.x = 0.4;
@@ -230,8 +241,8 @@ update: function () {
 		if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
 			player.body.velocity.y = -150;
 			player.animations.play('move', 100, false);
-			oxygenLevel -= 0.01;
-			oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel * 100) / 100 + '%';	
+			oxygenLevel -= 0.05;
+			oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel) + '%';	
 		} else {
 			player.body.velocity.y = -70;
 			player.animations.play('move', 10, false);
@@ -240,8 +251,8 @@ update: function () {
 		if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
 			player.body.velocity.y = 150;
 			player.animations.play('move', 100, false);
-			oxygenLevel -= 0.01;
-			oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel * 100) / 100 + '%';
+			oxygenLevel -= 0.05;
+			oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel) + '%';
 		} else{
 			player.body.velocity.y= 70;
 			player.animations.play('move', 10, false);
@@ -263,6 +274,10 @@ update: function () {
 			torpedoTime = game.time.now + 500;
 			ammo -= 1;
 		}
+		else if(game.time.now > torpedoTime && ammo <= 0){
+			empty = game.add.audio('empty');
+			empty.play();
+		}
 	}
 	
 	// mask changes with position
@@ -279,11 +294,13 @@ update: function () {
 	//mask.x=player.x;
 	//mask.y=player.y;
 
+
 	// check if oxygen level never falls below 0
 	if (oxygenLevel <= 0 ){
-		 this.game.add.text((game.camera.x) / 2, ( game.camera.y) / 2, 'You Lose!', {fontSize: '48px', fill: '#F30'});
-		 player.kill();
-		 this.game.paused = true;
+		endingText = this.game.add.text(60, 250, 'YOU LOSE!', {fontSize: '120px', fill: '#F30'}); 
+		endingText.fixedToCamera=true;
+		player.kill();
+		this.game.paused = true;
 	}
 	
 	// create shark1's movement
@@ -291,6 +308,7 @@ update: function () {
 	
 	// constantly send the player's position
 	socket.emit('move player', { x: player.x, y: player.y })
+	
 }
 
 }
@@ -398,6 +416,8 @@ function onOxygenCollected(data) {//data) {
 	oxygen.anchor.setTo(0.5,0.5);
 	oxygen.body.immovable = false;
 	oxygen.scale.setTo(0.2);
+	oxygenMusic = game.add.audio('o2music');
+	oxygenMusic.play();
 	
 }
 
@@ -422,7 +442,8 @@ function onTreasureFound(data) {
 	if(opponentTreasureFound== 2){
 		treasure.kill();
 		//this.game.add.text(player.x, player.y, 'You Lose!', {fontSize: '48px', fill: '#F30'});
-		endingText = game.add.text((game.camera.x + game.camera.width) / 2, (game.camera.y + game.camera.height) / 2, 'YOU LOSE!', {fontSize: '100px', fill: '#F30'} );
+		endingText = game.add.text(60, 250, 'YOU LOSE!', {fontSize: '120px', fill: '#F30'} );
+		endingText.fixedToCamera=true;
 		game.paused = true;
 	}
 	else if(opponentTreasureFound == 1 && treasureFound < 1){
@@ -441,20 +462,22 @@ function render () {
 
 function sharkHurts(player, shark) {
 	oxygenLevel -= 0.15;
-	oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel * 100) / 100 + '%';
+	oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel) + '%';
 	
 	explosion = game.add.sprite(player.x, player.y, 'kaboom');
 	explosion.mask = mask;
-	explosion.scale.setTo(.5);
+	explosion.scale.setTo(1);
 	explosion.tint = 0xff0000;
 	explosion.animations.add('explode', [21,22,23,24])
-	explosion.reset(player.x, player.y);
+	explosion.reset(player.x-30, player.y-35);
 	explosion.animations.play('explode', 40, false);
+	pain = game.add.audio('pain');
+	pain.play();
 }
 
 function OxygenDec() {
 	oxygenLevel -= 0.5;
-	oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel * 100) / 100 + '%';
+	oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel) + '%';
 }
 
 function collectOxygen ( player, oxygen) {
@@ -465,7 +488,7 @@ function collectOxygen ( player, oxygen) {
 	
 	oxygen.kill();
 	oxygenLevel = 100;
-	oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel * 100) / 100 + '%';
+	oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel) + '%';
 }
 
 function collecttorpedo ( player, torpedoCollect) {
@@ -475,6 +498,8 @@ function collecttorpedo ( player, torpedoCollect) {
 	torpedoCollect.kill();
 	ammo += 2;
 	torpedoText.text = 'Torpedoes Left: ' + ammo;
+	gunReload = game.add.audio('gunReload');
+	gunReload.play();
 }
 
 function winner(player, treasure){
@@ -487,7 +512,9 @@ function winner(player, treasure){
 	
 	if(treasureFound == 2){
 		treasure.kill();
-		endingText = game.add.text((game.camera.x + game.camera.width) / 2, (game.camera.y + game.camera.height) / 2, 'YOU WIN!', {fontSize: '150px', fill: '#090'} );
+		endingText = this.game.add.text(50, 250, 'YOU WIN!', {fontSize: '150px', fill: '#090'} );
+		endingText.fixedToCamera=true;
+		//this.game.add.text(16, 50, 'Torpedoes Left: 4', {fintSize: '32px', fill: '#FF0'} );
 		game.paused = true;
 	}
 	else if(treasureFound == 1 && opponentTreasureFound < 1){
@@ -498,6 +525,9 @@ function winner(player, treasure){
 		//spawn new treasure by simply reseting the coordinates
 		treasure.reset(50, 50);
 	}
+
+	treasureCollect = game.add.audio('treasureCollect');
+	treasureCollect.play();
 }
 
 function destroyWreckage( torpedo, obstacle){
@@ -512,6 +542,8 @@ function destroyWreckage( torpedo, obstacle){
 	explosion.animations.add('explode', [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24])
 	explosion.reset(obstacle.x, obstacle.y);
 	explosion.animations.play('explode', 30, false);
+	explosionSound = game.add.audio('explosionSound');
+	explosionSound.play();
 }
 
 function destroyShark( torpedo, shark){
@@ -527,6 +559,8 @@ function destroyShark( torpedo, shark){
 	explosion.animations.add('explode', [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24]);
 	explosion.reset(shark.x, shark.y);
 	explosion.animations.play('explode', 30, false);
+	explosionSound = game.add.audio('explosionSound');
+	explosionSound.play();
 }
 
 function createWreckage() {

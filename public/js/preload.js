@@ -20,8 +20,18 @@ preload.prototype = {
 		this.game.load.image('rock', 'assets/Rock.png');
 		this.game.load.image('rock2', 'assets/Rock2.png');
         //this.game.load.spritesheet('enemy', 'assets/dude.png', 64, 64)
-        this.game.load.spritesheet('dude', 'assets/diversprite.png', 256, 256)
+        this.game.load.spritesheet('dude', 'assets/diversprite.png', 256, 256);
         this.game.load.spritesheet('kaboom', 'assets/explosion.png', 64, 64);
+        this.game.load.audio('song', ['assets/audio/ComeAndFindMeBMix.mp3', 'assets/audio/ComeAndFindMeBMix.ogg']);
+        this.game.load.audio('o2music', ['assets/audio/o2powerup.mp3', 'assets/audio/o2powerup.ogg']);
+        this.game.load.audio('explosionSound', ['assets/audio/explosion.mp3', 'assets/audio/explosion.ogg']);
+        this.game.load.audio('pain', ['assets/audio/pain.mp3', 'assets/audio/pain.ogg']);
+        this.game.load.audio('punch', ['assets/audio/punch.mp3', 'assets/audio/punch.ogg']);
+        this.game.load.audio('empty', ['assets/audio/empty.mp3', 'assets/audio/empty.ogg']);
+        this.game.load.audio('heartbeat', ['assets/audio/heartbeat.mp3', 'assets/audio/heartbeat.ogg']);
+        this.game.load.audio('gunReload', ['assets/audio/gunReload.mp3', 'assets/audio/gunReload.ogg']);
+        this.game.load.audio('treasureCollect', ['assets/audio/treasureCollect.mp3', 'assets/audio/treasureCollect.ogg']);
+
 	},
   	create: function(){
 		this.game.state.start("GameTitle");
