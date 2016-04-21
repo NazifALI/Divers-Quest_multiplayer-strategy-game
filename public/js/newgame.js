@@ -144,9 +144,7 @@ create:function () {
 	torpedoes.setAll('checkWorldBounds', true);
 	
 	//mask all objects
-	// obstacle.mask = mask;
-	// obstacle2.mask = mask;
-	// obstacle3.mask = mask;
+	
 	wreckage.mask = mask; // to hide all wreckage
 	land.mask=mask;
 	treasure.mask = mask;
@@ -281,7 +279,7 @@ update: function () {
 
 	// check if oxygen level never falls below 0
 	if (oxygenLevel <= 0 ){
-		 this.game.add.text((game.camera.x) / 2, ( game.camera.y) / 2, 'You Lose!', {fontSize: '48px', fill: '#F30'});
+		 this.game.add.text(game.camera.x +300, game.camera.y + 300, 'You Lose!', {fontSize: '48px', fill: '#F30'});
 		 player.kill();
 		 this.game.paused = true;
 	}
@@ -487,7 +485,7 @@ function winner(player, treasure){
 	
 	if(treasureFound == 2){
 		treasure.kill();
-		endingText = game.add.text((game.camera.x + game.camera.width) / 2, (game.camera.y + game.camera.height) / 2, 'YOU WIN!', {fontSize: '150px', fill: '#090'} );
+		endingText = game.add.text(game.camera.x + 300, game.camera.y +300, 'YOU WIN!', {fontSize: '48px', fill: '#090'} );
 		game.paused = true;
 	}
 	else if(treasureFound == 1 && opponentTreasureFound < 1){
