@@ -124,11 +124,13 @@ create:function () {
 	sharks.physicsBodyType = Phaser.Physics.ARCADE;
 	shark1 = sharks.create(200, 300, 'shark');
 	shark1.body.velocity.x = 600;
+	shark1.name= 'shark1';
 	shark1.anchor.setTo(0.5);
 	shark2 = sharks.create(300, 0, 'shark');
 	shark2.body.velocity.y = 900;
 	shark2.anchor.setTo(0.5);
 	shark2.angle = 90;
+	shark2.name = 'shark2';
 	
 	// adding torpedo
 	torpedoes = game.add.group();
@@ -323,8 +325,19 @@ var setEventHandlers = function () {
 	socket.on('torpedo collected', onTorpedoCollected);
 	
 	socket.on('treasure found', onTreasureFound);
+	
+	socket.on('shark killed', onSharkKilled);
 }
 
+function onSharkKilled(obj)
+{
+	var check = function(child, name)
+	{
+		if (child.name == name)
+			child.destroy();
+	}
+	sharks.forEach(check,this,true,obj.name);
+}
 
 function onUpdateState(data) {
 	this.game= data;
@@ -545,7 +558,8 @@ function destroyShark( torpedo, shark){
 	console.log(torpedo.x);
 	console.log(torpedo.y);
 	torpedo.kill();
-	shark.kill();
+	socket.emit('shark killed', {name:shark.name});
+	shark.destroy();
 	
 	//adding explosion
 	explosion = game.add.sprite(player.x, player.y, 'kaboom');
