@@ -386,8 +386,8 @@ function onMovePlayer (data) {
 	}
 
 	// Update player position
-	movePlayer.player.x = data.x
-	movePlayer.player.y = data.y
+	//movePlayer.player.x = data.x
+	//movePlayer.player.y = data.y
 }
 
 // Remove player
