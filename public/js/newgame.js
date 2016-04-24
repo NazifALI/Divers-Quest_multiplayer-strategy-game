@@ -45,7 +45,10 @@ var endingText;
 var treasureFound = 0;
 var opponentTreasureFound = 0;
 var oxygenLevel = 100;
-var cursors
+var cursors;
+
+
+ 
 
 var newGame ={
 create:function () {
@@ -153,7 +156,7 @@ create:function () {
 	torpedoes.mask = mask;
 	
 	// create player's vision
-	mask.drawCircle(0,0,2000);
+	mask.drawCircle(0,0,200);
 
 	// holds other players
 	allPlayers = []
