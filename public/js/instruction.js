@@ -8,12 +8,12 @@ instruction.prototype= {
 		var leftArrow =this.game.add.sprite(360,150, "arrow");
 		leftArrow.anchor.setTo(0.5);
 		leftArrow.scale.setTo(0.4,0.4);
-		var textLeft = this.game.add.text(450, 150, 'move left', {fintSize: '20px', fill: '#FF0'});
+		var textLeft = this.game.add.text(450, 150, 'move right', {fintSize: '20px', fill: '#FF0'});
 		textLeft.anchor.setTo(0.5);
 		var rightArrow =this.game.add.sprite(360,100, "arrow");
 		rightArrow.anchor.setTo(0.5);
 		rightArrow.scale.setTo(-0.4,0.4);
-		var textRight = this.game.add.text(450, 100, 'move right', {fintSize: '20px', fill: '#FF0'});
+		var textRight = this.game.add.text(450, 100, 'move left', {fintSize: '20px', fill: '#FF0'});
 		textRight.anchor.setTo(0.5);
 		var downArrow =this.game.add.sprite(360,250, "arrow");
 		downArrow.anchor.setTo(0.5);

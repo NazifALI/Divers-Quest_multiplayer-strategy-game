@@ -2,11 +2,11 @@ var preload = function(game){}
 
 preload.prototype = {
 	preload: function(){ 
-        var loadingBar = this.add.sprite(160,240,"loading");
+        var loadingBar = this.add.sprite(game.world.centerX, game.world.centerY, "loading");
         loadingBar.anchor.setTo(0.5,0.5);
         this.load.setPreloadSprite(loadingBar);
 		this.game.load.image("gametitle","assets/logo.png");
-		this.game.load.image("play","assets/play.png");
+		this.game.load.image("play","assets/play3.png");
 		this.game.load.image("gameover","assets/gameover.png");
         this.game.load.image('see', 'assets/sea.jpg')
         this.game.load.image('earth2', 'assets/dark_grass.png')
@@ -19,7 +19,7 @@ preload.prototype = {
 		this.game.load.image('enemy', 'assets/dude.png');
 		this.game.load.image('rock', 'assets/Rock.png');
 		this.game.load.image('rock2', 'assets/Rock2.png');
-		this.game.load.image('instruction', 'assets/button.png');
+		this.game.load.image('instruction', 'assets/button3.png');
 		this.game.load.image('arrow', 'assets/arrow.png');
 		this.game.load.image('backButton', 'assets/backButton.png');
 		this.game.load.image('leftmouse','assets/leftmouse.png')

@@ -284,9 +284,9 @@ update: function () {
 		endingText.fixedToCamera=true;
 		player.kill();
 		this.game.paused = true;
-		this.game.add.text(game.camera.x +300, game.camera.y + 300, 'You Lose!', {fontSize: '48px', fill: '#F30'});
-		player.kill();
-		this.game.paused = true;
+		//this.game.add.text(game.camera.x +300, game.camera.y + 300, 'You Lose!', {fontSize: '48px', fill: '#F30'});
+		//player.kill();
+		//this.game.paused = true;
 	}
 	
 	// create shark1's movement
@@ -439,7 +439,9 @@ function onTreasureFound(data) {
 	if(opponentTreasureFound== 2){
 		treasure.kill();
 		//this.game.add.text(player.x, player.y, 'You Lose!', {fontSize: '48px', fill: '#F30'});
-		endingText = game.add.text((game.camera.x + game.camera.width) / 2, (game.camera.y + game.camera.height) / 2, 'YOU LOSE!', {fontSize: '100px', fill: '#F30'} );
+		//endingText = game.add.text((game.camera.x + game.camera.width) / 2, (game.camera.y + game.camera.height) / 2, 'YOU LOSE!', {fontSize: '100px', fill: '#F30'} );
+		endingText = this.game.add.text(60, 250, 'YOU LOSE!', {fontSize: '120px', fill: '#F30'}); 
+		endingText.fixedToCamera=true;
 		game.paused = true;
 	}
 	else {// if(opponentTreasureFound == 1 && treasureFound < 1){
@@ -523,7 +525,7 @@ function winner(player, treasure){
 		endingText = this.game.add.text(50, 250, 'YOU WIN!', {fontSize: '150px', fill: '#090'} );
 		endingText.fixedToCamera=true;
 		//this.game.add.text(16, 50, 'Torpedoes Left: 4', {fintSize: '32px', fill: '#FF0'} );
-		endingText = game.add.text(game.camera.x + 300, game.camera.y +300, 'YOU WIN!', {fontSize: '48px', fill: '#090'} );
+		//endingText = game.add.text(game.camera.x + 300, game.camera.y +300, 'YOU WIN!', {fontSize: '48px', fill: '#090'} );
 		game.paused = true;
 	}
 	else {
