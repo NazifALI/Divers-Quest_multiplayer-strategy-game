@@ -277,9 +277,6 @@ update: function () {
 	land.tilePosition.x = -this.game.camera.x
 	land.tilePosition.y = -this.game.camera.y
 
-	//mask.x=player.x;
-	//mask.y=player.y;
-
 
 	// check if oxygen level never falls below 0
 	if (oxygenLevel <= 0 ){

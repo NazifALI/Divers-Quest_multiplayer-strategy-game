@@ -15,11 +15,15 @@ preload.prototype = {
         this.game.load.image('shark', 'assets/shark.png')
         this.game.load.image('oxygen', 'assets/oxygen.png')
         this.game.load.image('wreckage', 'assets/wreckage.png')
-		game.load.image('torpedo', 'assets/torpedo.png');
+		this.game.load.image('torpedo', 'assets/torpedo.png');
 		this.game.load.image('enemy', 'assets/dude.png');
 		this.game.load.image('rock', 'assets/Rock.png');
 		this.game.load.image('rock2', 'assets/Rock2.png');
-        //this.game.load.spritesheet('enemy', 'assets/dude.png', 64, 64)
+		this.game.load.image('instruction', 'assets/button.png');
+		this.game.load.image('arrow', 'assets/arrow.png');
+		this.game.load.image('backButton', 'assets/backButton.png');
+		this.game.load.image('leftmouse','assets/leftmouse.png')
+		this.game.load.image('spacebar','assets/spacebar.png')
         this.game.load.spritesheet('dude', 'assets/diversprite.png', 256, 256);
         this.game.load.spritesheet('kaboom', 'assets/explosion.png', 64, 64);
         this.game.load.audio('song', ['assets/audio/ComeAndFindMeBMix.mp3', 'assets/audio/ComeAndFindMeBMix.ogg']);
