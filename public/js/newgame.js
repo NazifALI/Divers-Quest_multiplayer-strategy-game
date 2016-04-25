@@ -156,7 +156,7 @@ create:function () {
 	torpedoes.mask = mask;
 	
 	// create player's vision
-	mask.drawCircle(0,0,200);
+	mask.drawCircle(0,0,300);
 
 	// holds other players
 	allPlayers = []
@@ -201,25 +201,25 @@ update: function () {
 	// for left and right movement. The nested if statements check if Spacebar is pressed. If so the diver swims faster
 	if (cursors.left.isDown) {
 		if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-			player.body.velocity.x = -200;
+			player.body.velocity.x = -210;
 			player.scale.x = -0.4;
 			player.animations.play('move', 100, false);
 			oxygenLevel -= 0.05;
 			oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel) + '%';
 		} else {
-			player.body.velocity.x = -70;
+			player.body.velocity.x = -90;
 			player.scale.x = -0.4;
 			player.animations.play('move', 10, false);
 		}
 	} else if (cursors.right.isDown) {
 		if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-			player.body.velocity.x = 200;
+			player.body.velocity.x = 210;
 			player.scale.x = 0.4;
 			player.animations.play('move', 100, false);
 			oxygenLevel -= 0.05;
 			oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel) + '%';
 		} else {
-			player.body.velocity.x = 70;
+			player.body.velocity.x = 90;
 			player.scale.x = 0.4;
 			player.animations.play('move', 10, false);
 		}
@@ -228,22 +228,22 @@ update: function () {
 	// for up and down movement. The nested if statements check if Spacebar is pressed. If so the diver swims faster
 	if (cursors.up.isDown) {
 		if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-			player.body.velocity.y = -150;
+			player.body.velocity.y = -180;
 			player.animations.play('move', 100, false);
 			oxygenLevel -= 0.05;
 			oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel) + '%';	
 		} else {
-			player.body.velocity.y = -70;
+			player.body.velocity.y = -90;
 			player.animations.play('move', 10, false);
 		}
 	} else if (cursors.down.isDown) {
 		if (this.game.input.keyboard.isDown(Phaser.Keyboard.SPACEBAR)) {
-			player.body.velocity.y = 150;
+			player.body.velocity.y = 180;
 			player.animations.play('move', 100, false);
 			oxygenLevel -= 0.05;
 			oxygenText.text = 'Oxygen Level: ' + Math.round(oxygenLevel) + '%';
 		} else{
-			player.body.velocity.y= 70;
+			player.body.velocity.y= 90;
 			player.animations.play('move', 10, false);
 		}
 	}
@@ -386,8 +386,8 @@ function onMovePlayer (data) {
 	}
 
 	// Update player position
-	//movePlayer.player.x = data.x
-	//movePlayer.player.y = data.y
+	movePlayer.player.x = data.x
+	movePlayer.player.y = data.y
 }
 
 // Remove player
